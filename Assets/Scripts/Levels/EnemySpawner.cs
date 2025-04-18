@@ -12,15 +12,48 @@ public class EnemySpawner : MonoBehaviour
     public Image level_selector;
     public GameObject button;
     public GameObject enemy;
-    public SpawnPoint[] SpawnPoints;    
+    public SpawnPoint[] SpawnPoints;
+
+
+    public Dictionary<string, Enemy> enemy_types;
+    public Dictionary<string, Level> level_types;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // read json files (in separate function)
+        DeserializeEnemies();
+        DeserializeLevels();
+
         GameObject selector = Instantiate(button, level_selector.transform);
         selector.transform.localPosition = new Vector3(0, 130);
         selector.GetComponent<MenuSelectorController>().spawner = this;
         selector.GetComponent<MenuSelectorController>().SetLevel("Start");
+    }
+
+    void DeserializeEnemies()
+    {
+        enemy_types = new Dictionary<string, Enemy>();
+        var enemytext = Resources.Load<TextAsset>("enemies");
+        JToken jo = JToken.Parse(enemytext.text);
+        foreach (var enemy in jo)
+        {
+            Enemy en = enemy.ToObject<Enemy>();
+            enemy_types[en.name] = en;
+            Debug.Log(en.name);
+        }
+    }
+    void DeserializeLevels()
+    {
+        level_types = new Dictionary<string, Level>();
+        var leveltext = Resources.Load<TextAsset>("levels");
+        JToken jo = JToken.Parse(leveltext.text);
+        foreach (var enemy in jo)
+        {
+            Level en = enemy.ToObject<Level>();
+            level_types[en.name] = en;
+            Debug.Log(en.name);
+        }
     }
 
     // Update is called once per frame
