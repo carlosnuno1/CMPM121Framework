@@ -17,18 +17,27 @@ public class EnemySpawner : MonoBehaviour
 
     public Dictionary<string, Enemy> enemy_types;
     public Dictionary<string, Level> level_types;
+    public int current_wave;
+    public string current_level;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         // read json files (in separate function)
+        // can we put the duplicate code between these 2 into yet another separate function --------! todo
         DeserializeEnemies();
         DeserializeLevels();
 
-        GameObject selector = Instantiate(button, level_selector.transform);
-        selector.transform.localPosition = new Vector3(0, 130);
-        selector.GetComponent<MenuSelectorController>().spawner = this;
-        selector.GetComponent<MenuSelectorController>().SetLevel("Start");
+        // can we move this to a separate function? ------------------------------------------------! todo
+        int offset = 0;
+        foreach (var (k,v) in level_types)
+        {
+            GameObject selector = Instantiate(button, level_selector.transform);
+            selector.transform.localPosition = new Vector3(0, 130 - offset);
+            selector.GetComponent<MenuSelectorController>().spawner = this;
+            selector.GetComponent<MenuSelectorController>().SetLevel(k);
+            offset = offset + 50;
+        }
     }
 
     void DeserializeEnemies()
@@ -40,7 +49,6 @@ public class EnemySpawner : MonoBehaviour
         {
             Enemy en = enemy.ToObject<Enemy>();
             enemy_types[en.name] = en;
-            Debug.Log(en.name);
         }
     }
     void DeserializeLevels()
@@ -48,11 +56,10 @@ public class EnemySpawner : MonoBehaviour
         level_types = new Dictionary<string, Level>();
         var leveltext = Resources.Load<TextAsset>("levels");
         JToken jo = JToken.Parse(leveltext.text);
-        foreach (var enemy in jo)
+        foreach (var level in jo)
         {
-            Level en = enemy.ToObject<Level>();
-            level_types[en.name] = en;
-            Debug.Log(en.name);
+            Level a = level.ToObject<Level>();
+            level_types[a.name] = a;
         }
     }
 
@@ -65,6 +72,9 @@ public class EnemySpawner : MonoBehaviour
     public void StartLevel(string levelname)
     {
         level_selector.gameObject.SetActive(false);
+        current_wave = 1; // i kind of want this to start at zero.
+        if (!level_types.ContainsKey(levelname)) Debug.Log("Invalid levelname");
+        current_level = levelname;
         // this is not nice: we should not have to be required to tell the player directly that the level is starting
         GameManager.Instance.player.GetComponent<PlayerController>().StartLevel();
         StartCoroutine(SpawnWave());
@@ -72,6 +82,8 @@ public class EnemySpawner : MonoBehaviour
 
     public void NextWave()
     {
+        current_wave = current_wave + 1;
+        // dont start a new wave if current_wave > level_types[current_level].waves ----------------! todo
         StartCoroutine(SpawnWave());
     }
 
@@ -86,27 +98,59 @@ public class EnemySpawner : MonoBehaviour
             GameManager.Instance.countdown--;
         }
         GameManager.Instance.state = GameManager.GameState.INWAVE;
-        for (int i = 0; i < 10; ++i)
+        
+        // spawn each type of monster simultaneously (separate coroutines)
+        foreach (Spawn s in level_types[current_level].spawns)
         {
-            yield return SpawnZombie();
+            StartCoroutine(SpawnEnemyType(s));
         }
+        //WaitForSeconds(0.1f); i'm scared on a fast computer they'll get to the end before it gets a chance to spawn anything
         yield return new WaitWhile(() => GameManager.Instance.enemy_count > 0);
         GameManager.Instance.state = GameManager.GameState.WAVEEND;
     }
 
-    IEnumerator SpawnZombie()
+    IEnumerator SpawnEnemyType(Spawn s)
     {
-        SpawnPoint spawn_point = SpawnPoints[Random.Range(0, SpawnPoints.Length)];
-        Vector2 offset = Random.insideUnitCircle * 1.8f;
-                
-        Vector3 initial_position = spawn_point.transform.position + new Vector3(offset.x, offset.y, 0);
-        GameObject new_enemy = Instantiate(enemy, initial_position, Quaternion.identity);
+        // default sequence is [1]
+        // default delay is 2
+        int count = RPNEvaluator.EvaluateRPN(s.count, 0, current_wave);
+        List<int> sequence = new List<int>();
+        sequence.Add(1);
+        int delay = 2;
+        if (s.sequence != null) sequence = s.sequence;
+        int sequence_pointer = 0;
+        int i = 0;
+        // spawn up to the amount available in current sequence to add up to the count, separated by the delay
+        while (i < count)
+        {
+            // checking that current sequence value wont cause total spawns to exceed count
+            int amt = sequence[sequence_pointer];
+            if (amt > count - i) amt = count - i;
+            // spawn the enemies
+            yield return SpawnEnemy(s, amt, delay);
+            // update sequence/count tracking
+            sequence_pointer = (sequence_pointer + 1) % sequence.Count();
+            i = i + amt;
+        }
+    }
 
-        new_enemy.GetComponent<SpriteRenderer>().sprite = GameManager.Instance.enemySpriteManager.Get(0);
-        EnemyController en = new_enemy.GetComponent<EnemyController>();
-        en.hp = new Hittable(50, Hittable.Team.MONSTERS, new_enemy);
-        en.speed = 10;
-        GameManager.Instance.AddEnemy(new_enemy);
-        yield return new WaitForSeconds(0.5f);
+    IEnumerator SpawnEnemy(Spawn s, int sequence_amount, int delay)
+    {
+        for (int i = 0; i < sequence_amount; i++)
+        {
+            SpawnPoint spawn_point = SpawnPoints[Random.Range(0, SpawnPoints.Length)];
+            Vector2 offset = Random.insideUnitCircle * 1.8f;
+                    
+            Vector3 initial_position = spawn_point.transform.position + new Vector3(offset.x, offset.y, 0);
+            GameObject new_enemy = Instantiate(enemy, initial_position, Quaternion.identity);
+            new_enemy.GetComponent<SpriteRenderer>().sprite = GameManager.Instance.enemySpriteManager.Get(enemy_types[s.enemy].sprite);
+            EnemyController en = new_enemy.GetComponent<EnemyController>();
+
+            en.hp = new Hittable(RPNEvaluator.EvaluateRPN(s.hp, enemy_types[s.enemy].hp, current_wave), Hittable.Team.MONSTERS, new_enemy);
+            en.speed = enemy_types[s.enemy].speed;
+            //en.damage = enemy_types[s.enemy].damage; this causes an error. i am unsure where we're supposed to implement it otherwise though
+            GameManager.Instance.AddEnemy(new_enemy);
+        }
+        yield return new WaitForSeconds(delay);
     }
 }
