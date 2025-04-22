@@ -5325,6 +5325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4ef5265fce1b544c872205988919fb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  betweenWaveUI: {fileID: 1167482368}
   healthui: {fileID: 765025204}
   manaui: {fileID: 71109453}
   spellui: {fileID: 2085212185}

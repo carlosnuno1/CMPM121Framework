@@ -8,6 +8,7 @@ using System.Collections.Generic;
 public class PlayerController : MonoBehaviour
 {
     public Hittable hp;
+    public BetweenWaveUI betweenWaveUI;
     public HealthBar healthui;
     public ManaBar manaui;
 
@@ -36,6 +37,7 @@ public class PlayerController : MonoBehaviour
 
         // tell UI elements what to show
         healthui.SetHealth(hp);
+        betweenWaveUI.SetHealth(hp);
         manaui.SetSpellCaster(spellcaster);
         spellui.SetSpell(spellcaster.spell);
     }

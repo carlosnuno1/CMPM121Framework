@@ -1,9 +1,10 @@
 using UnityEngine;
 using TMPro;
 
-public class BetweenWaveMenu : MonoBehaviour
+public class BetweenWaveUI : MonoBehaviour
 {
     public TMP_Text waveText;
+    public Hittable hp;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -14,6 +15,12 @@ public class BetweenWaveMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (hp == null) return;
+        waveText.text = "Current HP: " + hp.hp.ToString();
+    }
+
+    public void SetHealth(Hittable hp)
+    {
+        this.hp = hp;
     }
 }
