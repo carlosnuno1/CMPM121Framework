@@ -8,7 +8,7 @@ using System.Collections.Generic;
 public class PlayerController : MonoBehaviour
 {
     public Hittable hp;
-    public BetweenWaveUI betweenWaveUI;
+    public RewardScreenManager rewardScreenManager;
     public HealthBar healthui;
     public ManaBar manaui;
 
@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
 
         // tell UI elements what to show
         healthui.SetHealth(hp);
-        betweenWaveUI.SetHealth(hp);
+        rewardScreenManager.SetHealth(hp);
         manaui.SetSpellCaster(spellcaster);
         spellui.SetSpell(spellcaster.spell);
     }
@@ -65,7 +65,7 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-        Debug.Log("You Lost");
+        GameManager.Instance.state = GameManager.GameState.GAMEOVER;
     }
 
 }

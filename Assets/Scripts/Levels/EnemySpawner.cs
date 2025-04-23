@@ -14,7 +14,6 @@ public class EnemySpawner : MonoBehaviour
     public GameObject enemy;
     public SpawnPoint[] SpawnPoints;
 
-
     public Dictionary<string, Enemy> enemy_types;
     public Dictionary<string, Level> level_types;
     public int current_wave;
@@ -87,6 +86,12 @@ public class EnemySpawner : MonoBehaviour
         StartCoroutine(SpawnWave());
     }
 
+    public void MainMenu()
+    {
+        GameManager.Instance.state = GameManager.GameState.PREGAME;
+        level_selector.gameObject.SetActive(true);
+
+    }
 
     IEnumerator SpawnWave()
     {
@@ -106,7 +111,17 @@ public class EnemySpawner : MonoBehaviour
         }
         //WaitForSeconds(0.1f); i'm scared on a fast computer they'll get to the end before it gets a chance to spawn anything
         yield return new WaitWhile(() => GameManager.Instance.enemy_count > 0);
-        GameManager.Instance.state = GameManager.GameState.WAVEEND;
+        if (GameManager.Instance.state != GameManager.GameState.GAMEOVER)
+        {
+            if (current_wave >= level_types[current_level].waves && level_types[current_level].name != "Endless")
+            {
+                GameManager.Instance.state = GameManager.GameState.GAMEWIN;
+            }
+            else
+            {
+                GameManager.Instance.state = GameManager.GameState.WAVEEND;
+            }
+        }
     }
 
     IEnumerator SpawnEnemyType(Spawn s)

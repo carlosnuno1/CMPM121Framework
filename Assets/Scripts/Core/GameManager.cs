@@ -11,7 +11,8 @@ public class GameManager
         INWAVE,
         WAVEEND,
         COUNTDOWN,
-        GAMEOVER
+        GAMEOVER,
+        GAMEWIN
     }
     public GameState state;
 
@@ -55,5 +56,14 @@ public class GameManager
     private GameManager()
     {
         enemies = new List<GameObject>();
+    }
+
+    public void ClearEnemies()
+    {
+        while(enemies.Count > 0)
+        {
+            UnityEngine.Object.Destroy(enemies[0]);
+            enemies.RemoveAt(0);
+        }
     }
 }
