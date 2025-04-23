@@ -148,12 +148,35 @@ public class EnemySpawner : MonoBehaviour
             i = i + amt;
         }
     }
+    private SpawnPoint EvaluateSpawnLocation(string s)
+    {
+        string[] tokens = s.Split(' ');
+        SpawnPoint outPoint = SpawnPoints[Random.Range(0, SpawnPoints.Length)];
+        if (tokens.Length < 2) return outPoint; // default to random if only one word, or no entry
+        SpawnPoint.SpawnName type = SpawnPoint.SpawnName.RED;
+        switch(tokens[1])
+        {
+            case "red":
+                type = SpawnPoint.SpawnName.RED;
+                break;
+            case "green":
+                type = SpawnPoint.SpawnName.GREEN;
+                break;
+            case "bone":
+                type = SpawnPoint.SpawnName.BONE;
+                break;
+        }
+        // REPLACE this later (this will cause an infinite loop if there isnt a valid spawn in SpawnPoints)
+        while (outPoint.kind != type) { outPoint = SpawnPoints[Random.Range(0, SpawnPoints.Length)]; }
+        return outPoint;
+    }
 
     IEnumerator SpawnEnemy(Spawn s, int sequence_amount, int delay)
     {
         for (int i = 0; i < sequence_amount; i++)
         {
-            SpawnPoint spawn_point = SpawnPoints[Random.Range(0, SpawnPoints.Length)];
+            // parse spawn location
+            SpawnPoint spawn_point = EvaluateSpawnLocation(s.location);
             Vector2 offset = Random.insideUnitCircle * 1.8f;
                     
             Vector3 initial_position = spawn_point.transform.position + new Vector3(offset.x, offset.y, 0);
