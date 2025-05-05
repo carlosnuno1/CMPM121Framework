@@ -7,52 +7,109 @@ public class RPNEvaluator
     {
         // initialize empty stack
         Stack<int> s = new Stack<int>();
+        s.Push(baseval);  // Push the base value first!
+        
         // split expression into tokens, and iterate over them
         string[] tokens = expr.Split(' ');
-        int a,b,val = 0;
+        int a, b;
         foreach (var token in tokens)
         {
             switch(token)
             {
-            // if token is an operator, pop 2 values and apply the operator, pushing the result
                 case "+":
                     b = s.Pop();
                     a = s.Pop();
-                    s.Push(a+b);
+                    s.Push(a + b);
                     break;
                 case "-":
                     b = s.Pop();
                     a = s.Pop();
-                    s.Push(a-b);
+                    s.Push(a - b);
                     break;
                 case "*":
                     b = s.Pop();
                     a = s.Pop();
-                    s.Push(a*b);
+                    s.Push(a * b);
                     break;
                 case "/":
                     b = s.Pop();
                     a = s.Pop();
-                    s.Push(a/b);
+                    s.Push(a / b);
                     break;
                 case "%":
                     b = s.Pop();
                     a = s.Pop();
-                    s.Push(a%b);
-                    break;
-            // if token is a value, push to stack
-                case "base":
-                    s.Push(baseval);
+                    s.Push(a % b);
                     break;
                 case "wave":
                     s.Push(wave);
                     break;
                 default:
-                    if (int.TryParse(token, out val)) s.Push(val);
+                    if (int.TryParse(token, out int val))
+                    {
+                        s.Push(val);
+                    }
                     break;
             }
         }
-        // pop and return the final value
+        return s.Pop();
+    }
+
+    /// <summary>
+    /// Evaluates an RPN expression, returning a float result.
+    /// Supports operators: + - * / %
+    /// Variables: power, wave
+    /// </summary>
+    public static float EvaluateRPNFloat(string expr, float baseval, int power, int wave)
+    {
+        Stack<float> s = new Stack<float>();
+        s.Push(baseval);  // Push the base value first!
+        
+        string[] tokens = expr.Split(' ');
+        float a, b;
+        foreach (var token in tokens)
+        {
+            switch(token)
+            {
+                case "+":
+                    b = s.Pop();
+                    a = s.Pop();
+                    s.Push(a + b);
+                    break;
+                case "-":
+                    b = s.Pop();
+                    a = s.Pop();
+                    s.Push(a - b);
+                    break;
+                case "*":
+                    b = s.Pop();
+                    a = s.Pop();
+                    s.Push(a * b);
+                    break;
+                case "/":
+                    b = s.Pop();
+                    a = s.Pop();
+                    s.Push(a / b);
+                    break;
+                case "%":
+                    b = s.Pop();
+                    a = s.Pop();
+                    s.Push(a % b);
+                    break;
+                case "power":
+                    s.Push(power);
+                    break;
+                case "wave":
+                    s.Push(wave);
+                    break;
+                default:
+                    if (float.TryParse(token, out float val))
+                    {
+                        s.Push(val);
+                    }
+                    break;
+            }
+        }
         return s.Pop();
     }
 }

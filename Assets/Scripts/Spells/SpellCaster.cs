@@ -2,41 +2,39 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class SpellCaster 
+public class SpellCaster : MonoBehaviour
 {
-    public int mana;
-    public int max_mana;
-    public int mana_reg;
-    public Hittable.Team team;
     public Spell spell;
-
-    public IEnumerator ManaRegeneration()
+    public float mana;
+    public float max_mana;
+    public float mana_regen;
+    public Hittable.Team team;
+    
+    void Start()
     {
-        while (true)
-        {
-            mana += mana_reg;
-            mana = Mathf.Min(mana, max_mana);
-            yield return new WaitForSeconds(1);
-        }
+        mana = max_mana;
     }
 
-    public SpellCaster(int mana, int mana_reg, Hittable.Team team)
+    void Update()
     {
-        this.mana = mana;
-        this.max_mana = mana;
-        this.mana_reg = mana_reg;
-        this.team = team;
-        spell = new SpellBuilder().Build(this);
+        mana = Mathf.Min(mana + mana_regen * Time.deltaTime, max_mana);
     }
 
-    public IEnumerator Cast(Vector3 where, Vector3 target)
-    {        
-        if (mana >= spell.GetManaCost() && spell.IsReady())
-        {
-            mana -= spell.GetManaCost();
-            yield return spell.Cast(where, target, team);
-        }
-        yield break;
+    public bool CanCast()
+    {
+        if (spell == null) return false;
+        // Now passing power and wave from GameManager
+        return spell.IsReady() && mana >= spell.GetManaCost(GameManager.Instance.power, GameManager.Instance.wave);
     }
 
+    public void Cast(Vector3 where, Vector3 target)
+    {
+        if (!CanCast()) return;
+        
+        // Get mana cost with current power/wave
+        int cost = spell.GetManaCost(GameManager.Instance.power, GameManager.Instance.wave);
+        mana -= cost;
+        
+        StartCoroutine(spell.Cast(where, target, team));
+    }
 }

@@ -32,21 +32,22 @@ public class SpellUI : MonoBehaviour
         if (spell == null) return;
         if (Time.time > last_text_update + UPDATE_DELAY)
         {
-            manacost.text = spell.GetManaCost().ToString();
-            damage.text = spell.GetDamage().ToString();
+            manacost.text = spell.GetManaCost(
+                GameManager.Instance.power, 
+                GameManager.Instance.wave
+            ).ToString();
+            
+            damage.text = spell.GetDamage(
+                GameManager.Instance.power, 
+                GameManager.Instance.wave
+            ).ToString();
+            
             last_text_update = Time.time;
         }
         
-        float since_last = Time.time - spell.last_cast;
-        float perc;
-        if (since_last > spell.GetCooldown())
-        {
-            perc = 0;
-        }
-        else
-        {
-            perc = 1-since_last / spell.GetCooldown();
-        }
-        cooldown.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 48 * perc);
+        float cooldownRemaining = spell.GetCooldown();
+        float timeSinceLastCast = Time.time - spell.GetLastCastTime();
+        float perc = timeSinceLastCast / cooldownRemaining;
+        cooldown.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 48 * (1 - Mathf.Clamp01(perc)));
     }
 }

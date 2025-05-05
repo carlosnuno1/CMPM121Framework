@@ -3,61 +3,52 @@ using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-public class Spell 
+public abstract class Spell 
 {
-    public float last_cast;
-    public SpellCaster owner;
-    public Hittable.Team team;
+    // Core properties every spell needs
+    protected SpellCaster owner;
+    protected float last_cast;
+    
+    // Basic attributes from JSON
+    protected string name;
+    protected string description;
+    protected int icon;
 
-    public Spell(SpellCaster owner)
+    protected Spell(SpellCaster owner)
     {
         this.owner = owner;
+        this.last_cast = -999f; // Ensure first cast is available
     }
 
-    public string GetName()
-    {
-        return "Bolt";
-    }
+    // Core methods for all spells
+    public abstract string GetName();
+    public abstract string GetDescription();
+    public abstract int GetIcon();
+    
+    // Scalable attributes
+    public abstract int GetManaCost(int power, int wave);
+    public abstract float GetCooldown();
+    public abstract int GetDamage(int power, int wave);
 
-    public int GetManaCost()
-    {
-        return 10;
-    }
+    // JSON initialization
+    public abstract void SetAttributes(JObject json);
 
-    public int GetDamage()
-    {
-        return 100;
-    }
+    // Casting 
+    public abstract IEnumerator Cast(Vector3 where, Vector3 target, Hittable.Team team);
 
-    public float GetCooldown()
-    {
-        return 0.75f;
-    }
+    // Add this accessor for UI
+    public float GetLastCastTime() => last_cast;
 
-    public virtual int GetIcon()
-    {
-        return 0;
-    }
-
+    // Update IsReady to use GetLastCastTime
     public bool IsReady()
     {
-        return (last_cast + GetCooldown() < Time.time);
+        return (GetLastCastTime() + GetCooldown() < Time.time);
     }
 
-    public virtual IEnumerator Cast(Vector3 where, Vector3 target, Hittable.Team team)
+    // Factory method to create the right type of spell from JSON
+    public static Spell FromJson(JObject json, SpellCaster owner)
     {
-        this.team = team;
-        GameManager.Instance.projectileManager.CreateProjectile(0, "straight", where, target - where, 15f, OnHit);
-        yield return new WaitForEndOfFrame();
+        // We'll implement this later when we have concrete classes
+        throw new System.NotImplementedException();
     }
-
-    void OnHit(Hittable other, Vector3 impact)
-    {
-        if (other.team != team)
-        {
-            other.Damage(new Damage(GetDamage(), Damage.Type.ARCANE));
-        }
-
-    }
-
 }

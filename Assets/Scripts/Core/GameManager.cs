@@ -37,6 +37,17 @@ public class GameManager
     private List<GameObject> enemies;
     public int enemy_count { get { return enemies.Count; } }
 
+    // Add these properties for spell scaling
+    public int power { get; private set; } = 1;  // Start at power level 1
+    public int wave { get; private set; } = 1;   // Start at wave 1
+
+    // Method to update power based on wave number
+    public void UpdatePower()
+    {
+        // "wave 10 *" from the requirements
+        power = (int)RPNEvaluator.EvaluateRPNFloat("wave 10 *", 0, 0, wave);
+    }
+
     public void AddEnemy(GameObject enemy)
     {
         enemies.Add(enemy);
