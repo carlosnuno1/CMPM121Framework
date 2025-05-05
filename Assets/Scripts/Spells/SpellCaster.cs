@@ -12,6 +12,9 @@ public class SpellCaster : MonoBehaviour
     public float mana_regen;
     public int power;
     
+    // List to store the player's spells
+    private List<Spell> spells = new List<Spell>();
+
     void Start()
     {
         mana = max_mana;
@@ -50,5 +53,45 @@ public class SpellCaster : MonoBehaviour
         StartCoroutine(spell.Cast(where, target, team));
         
         return true;
+    }
+
+    // Get the number of spells the player has
+    public int GetSpellCount()
+    {
+        return spells.Count;
+    }
+
+    // Get a spell at a specific index
+    public Spell GetSpell(int index)
+    {
+        if (index >= 0 && index < spells.Count)
+        {
+            return spells[index];
+        }
+        return null;
+    }
+
+    // Add a new spell to the player's collection
+    public void AddSpell(Spell spell)
+    {
+        spells.Add(spell);
+    }
+
+    // Remove a spell at a specific index
+    public void RemoveSpell(int index)
+    {
+        if (index >= 0 && index < spells.Count)
+        {
+            spells.RemoveAt(index);
+        }
+    }
+
+    // Replace a spell at a specific index with a new spell
+    public void ReplaceSpell(int index, Spell newSpell)
+    {
+        if (index >= 0 && index < spells.Count)
+        {
+            spells[index] = newSpell;
+        }
     }
 }

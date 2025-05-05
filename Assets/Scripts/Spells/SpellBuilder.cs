@@ -1,144 +1,259 @@
 using UnityEngine;
-using System.Collections.Generic;      // Keep this for Dictionary
-using System.Linq;
+using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
-public class SpellBuilder 
+public class SpellBuilder
 {
-    private static JObject spellData;
-    private static System.Random random = new System.Random();
-
-    private static readonly HashSet<string> KNOWN_BASE_SPELLS = new HashSet<string> 
-    {
-        "arcane_bolt",
-        "magic_missile",
-        "arcane_blast",
-        "arcane_spray"
-    };
+    private static JObject spellsJson;
+    private static Dictionary<string, JObject> baseSpells = new Dictionary<string, JObject>();
+    private static Dictionary<string, JObject> modifierSpells = new Dictionary<string, JObject>();
+    
+    // Probability weights for number of modifiers
+    private static int[] modifierCountWeights = new int[] { 60, 30, 10 }; // 0, 1, 2 modifiers
 
     public static void Initialize(string jsonText)
     {
-        spellData = JObject.Parse(jsonText);
-    }
-
-    public static Spell Build(string spellId, SpellCaster owner)
-    {
-        if (spellData == null)
+        spellsJson = JObject.Parse(jsonText);
+        
+        // Separate base spells and modifier spells
+        foreach (var prop in spellsJson.Properties())
         {
-            Debug.LogError("SpellBuilder not initialized!");
-            return null;
-        }
-
-        var spellJson = spellData[spellId];
-        if (spellJson == null)
-        {
-            Debug.LogError($"No spell found with ID: {spellId}");
-            return null;
-        }
-
-        return BuildFromJson(spellJson, spellId, owner);
-    }
-
-    public static Spell BuildRandom(SpellCaster owner)
-    {
-        Debug.Log("Building random spell...");
-        
-        // Get all spell IDs
-        var spellIds = spellData.Properties().Select(p => p.Name).ToList();
-        
-        // First, get a list of base spells (non-modifiers)
-        var baseSpells = spellIds.Where(id => KNOWN_BASE_SPELLS.Contains(id)).ToList();
-        Debug.Log($"Found {baseSpells.Count} base spells: {string.Join(", ", baseSpells)}");
-        
-        if (baseSpells.Count == 0)
-        {
-            Debug.LogError("No base spells found in JSON!");
-            return null;
-        }
-        
-        // Start with a random base spell
-        string baseSpellId = baseSpells[random.Next(baseSpells.Count)];
-        Debug.Log($"Selected base spell: {baseSpellId}");
-        var spell = Build(baseSpellId, owner);
-
-        // Get list of modifier spells
-        var modifierSpells = spellIds.Where(id => !KNOWN_BASE_SPELLS.Contains(id)).ToList();
-        Debug.Log($"Found {modifierSpells.Count} modifier spells: {string.Join(", ", modifierSpells)}");
-        
-        // Randomly apply 0-2 modifiers
-        int numModifiers = random.Next(3); // 0, 1, or 2
-        Debug.Log($"Will apply {numModifiers} modifiers");
-        
-        var shuffledModifiers = modifierSpells.OrderBy(x => random.Next()).Take(numModifiers).ToList();
-        foreach (var modId in shuffledModifiers)
-        {
-            Debug.Log($"Applying modifier: {modId}");
-            var modifier = Build(modId, owner) as ModifierSpell;
-            if (modifier != null)
+            string spellKey = prop.Name;
+            JObject spellData = (JObject)prop.Value;
+            
+            // Check if this is a modifier spell
+            if (spellData["type"] != null && spellData["type"].ToString() == "modifier")
             {
-                modifier.SetInnerSpell(spell);
-                spell = modifier;
+                modifierSpells.Add(spellKey, spellData);
+            }
+            else
+            {
+                baseSpells.Add(spellKey, spellData);
             }
         }
-
-        return spell;
+        
+        Debug.Log($"SpellBuilder initialized with {baseSpells.Count} base spells and {modifierSpells.Count} modifier spells");
     }
-
-    private static Spell BuildFromJson(JToken spellJson, string spellId, SpellCaster owner)
+    
+    // Create a spell from its key
+    public static Spell CreateSpell(string spellKey, SpellCaster owner)
     {
-        if (spellJson == null)
+        if (!spellsJson.ContainsKey(spellKey))
         {
-            Debug.LogError($"Spell {spellId} not found in JSON!");
+            Debug.LogError($"Spell key '{spellKey}' not found in spells.json");
             return null;
         }
-
-        // Create the appropriate spell type
-        Spell spell;
-        bool isModifier = !KNOWN_BASE_SPELLS.Contains(spellId);
-        Debug.Log($"Building spell {spellId} (isModifier: {isModifier})");
-
+        
+        JObject spellData = (JObject)spellsJson[spellKey];
+        return CreateSpellFromJson(spellKey, spellData, owner);
+    }
+    
+    // Create a spell from JSON data
+    private static Spell CreateSpellFromJson(string spellKey, JObject spellData, SpellCaster owner)
+    {
+        // Check if this is a modifier spell
+        bool isModifier = spellData["type"] != null && spellData["type"].ToString() == "modifier";
+        
         if (isModifier)
         {
-            spell = new ModifierSpell(owner, null);  // inner spell will be set later
+            // For modifier spells, we need to know what spell they're modifying
+            if (spellData["inner_spell"] != null)
+            {
+                string innerSpellKey = spellData["inner_spell"].ToString();
+                Spell innerSpell = CreateSpell(innerSpellKey, owner);
+                
+                // Create the appropriate modifier spell
+                return CreateModifierSpell(spellKey, spellData, owner, innerSpell);
+            }
+            else
+            {
+                Debug.LogError($"Modifier spell '{spellKey}' has no inner_spell specified");
+                return null;
+            }
         }
         else
         {
-            spell = new ConcreteSpell(owner);
+            // Create the appropriate base spell
+            return CreateBaseSpell(spellKey, spellData, owner);
         }
-
-        // Set the attributes
-        spell.SetAttributes((JObject)spellJson);
+    }
+    
+    // Create a base spell based on its type
+    private static Spell CreateBaseSpell(string spellKey, JObject spellData, SpellCaster owner)
+    {
+        string spellType = spellKey;
+        if (spellData["spell_type"] != null)
+        {
+            spellType = spellData["spell_type"].ToString();
+        }
+        
+        switch (spellType)
+        {
+            case "arcane_bolt":
+                return new ArcaneBoltSpell(owner, spellData);
+            case "arcane_spray":
+                return new ArcaneSpraySpell(owner, spellData);
+            case "magic_missile":
+                return new MagicMissileSpell(owner, spellData);
+            case "arcane_explosion":
+                return new ArcaneExplosionSpell(owner, spellData);
+            case "frost_nova":
+                return new FrostNovaSpell(owner, spellData);
+            default:
+                Debug.LogWarning($"Unknown base spell type '{spellType}', defaulting to ArcaneBoltSpell");
+                return new ArcaneBoltSpell(owner, spellData);
+        }
+    }
+    
+    // Create a modifier spell based on its type
+    private static Spell CreateModifierSpell(string spellKey, JObject spellData, SpellCaster owner, Spell innerSpell)
+    {
+        string modifierType = spellKey;
+        if (spellData["modifier_type"] != null)
+        {
+            modifierType = spellData["modifier_type"].ToString();
+        }
+        
+        ModifierSpell modSpell = null;
+        
+        switch (modifierType)
+        {
+            case "splitter":
+                modSpell = new SplitterSpell(owner, spellData);
+                break;
+            case "doubler":
+                modSpell = new DoublerSpell(owner, spellData);
+                break;
+            case "damage_magnifier":
+                modSpell = new DamageMagnifierSpell(owner, spellData);
+                break;
+            case "speed_modifier":
+                modSpell = new SpeedModifierSpell(owner, spellData);
+                break;
+            case "chaotic":
+                modSpell = new ChaoticSpell(owner, spellData);
+                break;
+            case "homing":
+                modSpell = new HomingSpell(owner, spellData);
+                break;
+            case "piercing":
+                modSpell = new PiercingSpell(owner, spellData);
+                break;
+            case "explosive":
+                modSpell = new ExplosiveSpell(owner, spellData);
+                break;
+            default:
+                Debug.LogWarning($"Unknown modifier type '{modifierType}', defaulting to generic ModifierSpell");
+                modSpell = ModifierSpell.FromJson(owner, spellData);
+                break;
+        }
+        
+        if (modSpell != null)
+        {
+            modSpell.SetInnerSpell(innerSpell);
+        }
+        
+        return modSpell;
+    }
+    
+    // Generate a random spell (base spell with random modifiers)
+    public static Spell GenerateRandomSpell(SpellCaster owner)
+    {
+        // Select a random base spell
+        string baseSpellKey = GetRandomKey(baseSpells);
+        JObject baseSpellData = baseSpells[baseSpellKey];
+        
+        // Create the base spell
+        Spell spell = CreateBaseSpell(baseSpellKey, baseSpellData, owner);
+        
+        // Determine how many modifiers to add
+        int modifierCount = GetWeightedRandomIndex(modifierCountWeights);
+        
+        // Add random modifiers
+        for (int i = 0; i < modifierCount; i++)
+        {
+            string modifierKey = GetRandomKey(modifierSpells);
+            JObject modifierData = modifierSpells[modifierKey];
+            
+            // Create a modifier spell that wraps our current spell
+            ModifierSpell modSpell = null;
+            
+            switch (modifierKey)
+            {
+                case "splitter":
+                    modSpell = new SplitterSpell(owner);
+                    break;
+                case "doubler":
+                    modSpell = new DoublerSpell(owner);
+                    break;
+                case "damage_magnifier":
+                    modSpell = new DamageMagnifierSpell(owner);
+                    break;
+                case "speed_modifier":
+                    modSpell = new SpeedModifierSpell(owner);
+                    break;
+                case "chaotic":
+                    modSpell = new ChaoticSpell(owner);
+                    break;
+                case "homing":
+                    modSpell = new HomingSpell(owner);
+                    break;
+                case "piercing":
+                    modSpell = new PiercingSpell(owner);
+                    break;
+                case "explosive":
+                    modSpell = new ExplosiveSpell(owner);
+                    break;
+                default:
+                    modSpell = new ModifierSpell(owner);
+                    break;
+            }
+            
+            modSpell.SetAttributes(modifierData);
+            modSpell.SetInnerSpell(spell);
+            spell = modSpell;
+        }
+        
         return spell;
     }
-
-    public static JObject GetDefinition(string spellId)
+    
+    // Helper method to get a random key from a dictionary
+    private static string GetRandomKey<T>(Dictionary<string, T> dict)
     {
-        if (!spellData.TryGetValue(spellId, out var def))
+        int index = UnityEngine.Random.Range(0, dict.Count);
+        return dict.Keys.ElementAt(index);
+    }
+    
+    // Helper method to get a weighted random index
+    private static int GetWeightedRandomIndex(int[] weights)
+    {
+        int totalWeight = weights.Sum();
+        int randomValue = UnityEngine.Random.Range(0, totalWeight);
+        
+        int cumulativeWeight = 0;
+        for (int i = 0; i < weights.Length; i++)
         {
-            Debug.LogError($"SpellBuilder: no definition for '{spellId}'");
-            return null;
+            cumulativeWeight += weights[i];
+            if (randomValue < cumulativeWeight)
+            {
+                return i;
+            }
         }
-        return def as JObject;
+        
+        return 0; // Fallback
     }
 
-    public static IEnumerable<string> AllSpellIds()
+    // Alias for CreateSpell to maintain compatibility
+    public static Spell Build(string spellKey, SpellCaster owner)
     {
-        return spellData.Properties().Select(p => p.Name);
+        return CreateSpell(spellKey, owner);
     }
 
-    public static void DebugPrintSpellData()
+    // Alias for GenerateRandomSpell to maintain compatibility
+    public static Spell BuildRandom(SpellCaster owner)
     {
-        if (spellData == null)
-        {
-            Debug.Log("SpellBuilder not initialized!");
-            return;
-        }
-
-        Debug.Log("All spells in JSON:");
-        foreach (var prop in spellData.Properties())
-        {
-            bool isModifier = !KNOWN_BASE_SPELLS.Contains(prop.Name);
-            Debug.Log($"- {prop.Name} (modifier: {isModifier})");
-        }
+        return GenerateRandomSpell(owner);
     }
 }

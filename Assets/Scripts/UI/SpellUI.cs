@@ -4,50 +4,103 @@ using TMPro;
 
 public class SpellUI : MonoBehaviour
 {
-    public GameObject icon;
-    public RectTransform cooldown;
-    public TextMeshProUGUI manacost;
-    public TextMeshProUGUI damage;
-    public GameObject highlight;
-    public Spell spell;
-    float last_text_update;
-    const float UPDATE_DELAY = 1;
-    public GameObject dropbutton;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public Image icon;
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI damageText;
+    public TextMeshProUGUI manaText;
+    public Image cooldownImage;
+    public Button dropButton;
+    
+    private Spell spell;
+    private SpellCaster caster;
+    private int spellIndex;
+    
     void Start()
     {
-        last_text_update = 0;
-    }
-
-    public void SetSpell(Spell spell)
-    {
-        this.spell = spell;
-        GameManager.Instance.spellIconManager.PlaceSprite(spell.GetIcon(), icon.GetComponent<Image>());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (spell == null) return;
-        if (Time.time > last_text_update + UPDATE_DELAY)
+        // Find the spell caster
+        caster = GetComponentInParent<SpellCaster>();
+        
+        // Set up drop button
+        if (dropButton != null)
         {
-            manacost.text = spell.GetManaCost(
-                GameManager.Instance.power, 
-                GameManager.Instance.wave
-            ).ToString();
-            
-            damage.text = spell.GetDamage(
-                GameManager.Instance.power, 
-                GameManager.Instance.wave
-            ).ToString();
-            
-            last_text_update = Time.time;
+            dropButton.onClick.AddListener(DropSpell);
+        }
+    }
+    
+    public void SetSpell(Spell newSpell, int index)
+    {
+        spell = newSpell;
+        spellIndex = index;
+        
+        // Update UI elements
+        if (nameText != null)
+            nameText.text = spell.GetName();
+        
+        // Get spell icon
+        if (icon != null)
+        {
+            int iconIndex = spell.GetIcon();
+            // Check how to get the icon from the icon index
+            // icon.sprite = GameManager.Instance.spellIconManager.GetIcon(iconIndex);
+            // For now, let's use a placeholder approach
+            icon.sprite = Resources.Load<Sprite>($"SpellIcons/icon_{iconIndex}");
         }
         
-        float cooldownRemaining = spell.GetCooldown();
-        float timeSinceLastCast = Time.time - spell.GetLastCastTime();
-        float perc = timeSinceLastCast / cooldownRemaining;
-        cooldown.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 48 * (1 - Mathf.Clamp01(perc)));
+        // Update stats
+        UpdateStats();
+    }
+    
+    // Overload for backward compatibility
+    public void SetSpell(Spell newSpell)
+    {
+        SetSpell(newSpell, 0);
+    }
+    
+    void Update()
+    {
+        if (spell != null)
+        {
+            // Update cooldown display
+            if (cooldownImage != null)
+            {
+                float cooldownTime = spell.GetCooldown();
+                // Calculate cooldown remaining based on last cast time and current time
+                float timeSinceLastCast = Time.time - spell.GetLastCastTime();
+                float cooldownRemaining = Mathf.Max(0, cooldownTime - timeSinceLastCast);
+                float cooldownPercentage = Mathf.Clamp01(cooldownRemaining / cooldownTime);
+                cooldownImage.fillAmount = cooldownPercentage;
+            }
+            
+            // Update stats periodically (in case power changes)
+            if (Time.frameCount % 30 == 0)
+            {
+                UpdateStats();
+            }
+        }
+    }
+    
+    private void UpdateStats()
+    {
+        if (caster != null && spell != null)
+        {
+            int power = caster.power;
+            int wave = GameManager.Instance.wave;
+            
+            if (damageText != null)
+                damageText.text = $"DMG: {spell.GetDamage(power, wave)}";
+            
+            if (manaText != null)
+                manaText.text = $"MP: {spell.GetManaCost(power, wave)}";
+        }
+    }
+    
+    private void DropSpell()
+    {
+        // Get the SpellUIContainer and drop this spell
+        SpellUIContainer container = GetComponentInParent<SpellUIContainer>();
+        if (container != null)
+        {
+            container.DropSpell(spellIndex);
+        }
     }
 }

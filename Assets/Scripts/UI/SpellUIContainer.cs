@@ -1,25 +1,56 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class SpellUIContainer : MonoBehaviour
 {
-    public GameObject[] spellUIs;
-    public PlayerController player;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public SpellUI[] spellUIs;
+    private SpellCaster spellCaster;
+    
     void Start()
     {
-        // we only have one spell (right now)
-        spellUIs[0].SetActive(true);
-        for(int i = 1; i< spellUIs.Length; ++i)
+        spellCaster = GetComponent<SpellCaster>();
+        
+        // Initialize spell UIs
+        UpdateSpellUI();
+    }
+    
+    public void UpdateSpellUI()
+    {
+        // Get the list of spells from the SpellCaster
+        List<Spell> spells = new List<Spell>();
+        for (int i = 0; i < spellCaster.GetSpellCount(); i++)
         {
-            spellUIs[i].SetActive(false);
+            spells.Add(spellCaster.GetSpell(i));
+        }
+        
+        // Update each spell UI based on the player's spells
+        for (int i = 0; i < spellUIs.Length; i++)
+        {
+            if (i < spells.Count)
+            {
+                // Show and update this spell UI
+                spellUIs[i].gameObject.SetActive(true);
+                spellUIs[i].SetSpell(spells[i], i);
+            }
+            else
+            {
+                // Hide this spell UI
+                spellUIs[i].gameObject.SetActive(false);
+            }
         }
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    public void DropSpell(int index)
     {
-        
+        // Check if the index is valid
+        if (index >= 0 && index < spellCaster.GetSpellCount())
+        {
+            // Remove the spell
+            spellCaster.RemoveSpell(index);
+            
+            // Update the UI
+            UpdateSpellUI();
+        }
     }
-
 }

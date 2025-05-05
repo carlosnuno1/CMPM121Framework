@@ -36,8 +36,11 @@ public abstract class Spell
     // Casting 
     public abstract IEnumerator Cast(Vector3 where, Vector3 target, Hittable.Team team);
 
-    // Add this accessor for UI
-    public float GetLastCastTime() => last_cast;
+    // Get the time of the last cast
+    public float GetLastCastTime()
+    {
+        return last_cast;
+    }
 
     // Update IsReady to use GetLastCastTime
     public bool IsReady()
