@@ -56465,11 +56465,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65137bb55ab2f454e9ae3dcb7ee7f513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 1718273952}
   spellUIs:
   - {fileID: 2085212183}
   - {fileID: 96316927}
   - {fileID: 457295002}
   - {fileID: 797691353}
+  spellCaster: {fileID: 0}
 --- !u!1 &2007398911
 GameObject:
   m_ObjectHideFlags: 0

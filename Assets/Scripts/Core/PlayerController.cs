@@ -37,7 +37,9 @@ public class PlayerController : MonoBehaviour
         UpdatePlayerStats();
         
         // Set initial spell
-        spellcaster.spell = SpellBuilder.Build("arcane_bolt", spellcaster);
+        SpellBuilder.Initialize(Resources.Load<TextAsset>("spells").text);
+        spellcaster.AddSpell(SpellBuilder.Build("arcane_bolt", spellcaster));
+        spellcaster.spell = spellcaster.GetSpell(0);
 
         hp = new Hittable(100, Hittable.Team.PLAYER, gameObject);
         hp.OnDeath += Die;
@@ -58,24 +60,23 @@ public class PlayerController : MonoBehaviour
 
     void UpdatePlayerStats()
     {
+        int wave = GameManager.Instance.wave;
         // From requirements:
         // Player hp to "95 wave 5 * +"
-        // Player mana to "90 wave 10 * +"
-        // Player mana regeneration to "10 wave +"
-        // Player spell power to "wave 10 *"
-        // Player speed to "5"
-        
-        int wave = GameManager.Instance.wave;
-        
         if (hp != null)
         {
             float newHp = RPNEvaluator.EvaluateRPNFloat("95 wave 5 * +", 0, 0, wave);
             hp.SetMaxHP((int)newHp);
         }
-
+        // Player mana to "90 wave 10 * +"
         spellcaster.max_mana = RPNEvaluator.EvaluateRPNFloat("90 wave 10 * +", 0, 0, wave);
         spellcaster.mana = spellcaster.max_mana;
+        // Player mana regeneration to "10 wave +"
         spellcaster.mana_regen = RPNEvaluator.EvaluateRPNFloat("10 wave +", 0, 0, wave);
+        // Player spell power to "wave 10 *"
+        spellcaster.power = (int)RPNEvaluator.EvaluateRPNFloat("wave 10 *", 0, 0, wave);
+        // Player speed to "5"
+        speed = 5;
     }
 
     // Update is called once per frame
@@ -83,6 +84,10 @@ public class PlayerController : MonoBehaviour
     {
         // Movement
         transform.Translate(movement * speed * Time.deltaTime);
+
+        // Switch active spell
+        SwitchSpell();
+        //spellcaster.spell = spellcaster.GetSpell(1);
 
         // Cast spell on left click
         if (Input.GetMouseButtonDown(0) && spellcaster != null)  // Changed from GetMouseButton to GetMouseButtonDown
@@ -92,6 +97,13 @@ public class PlayerController : MonoBehaviour
             mousePos.z = 0;  // Keep it in 2D plane
             spellcaster.Cast(transform.position, mousePos);
         }
+    }
+    void SwitchSpell()
+    {
+        if(Input.GetKeyDown(KeyCode.Alpha1) && spellcaster.GetSpellCount() > 0) spellcaster.spell = spellcaster.GetSpell(0);
+        if(Input.GetKeyDown(KeyCode.Alpha2) && spellcaster.GetSpellCount() > 1) spellcaster.spell = spellcaster.GetSpell(1);
+        if(Input.GetKeyDown(KeyCode.Alpha3) && spellcaster.GetSpellCount() > 2) spellcaster.spell = spellcaster.GetSpell(2);
+        if(Input.GetKeyDown(KeyCode.Alpha4) && spellcaster.GetSpellCount() > 3) spellcaster.spell = spellcaster.GetSpell(3);
     }
 
     public void OnMove(InputValue value)
