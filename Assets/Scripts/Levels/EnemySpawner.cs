@@ -109,7 +109,7 @@ public class EnemySpawner : MonoBehaviour
         {
             StartCoroutine(SpawnEnemyType(s));
         }
-        //WaitForSeconds(0.1f); i'm scared on a fast computer they'll get to the end before it gets a chance to spawn anything
+        yield return new WaitForSeconds(1f); // temporary, to prevent player from ending wave early by killing early spawns
         yield return new WaitWhile(() => GameManager.Instance.enemy_count > 0);
         if (GameManager.Instance.state != GameManager.GameState.GAMEOVER)
         {
