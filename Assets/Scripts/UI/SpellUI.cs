@@ -10,6 +10,8 @@ public class SpellUI : MonoBehaviour
     public TextMeshProUGUI manaText;
     public RectTransform cooldownImage;
     public Button dropButton;
+
+    public GameObject player;
     
     private Spell spell;
     private SpellCaster caster;
@@ -18,7 +20,7 @@ public class SpellUI : MonoBehaviour
     void Start()
     {
         // Find the spell caster
-        caster = GetComponentInParent<SpellCaster>();
+        caster = player.GetComponent<SpellCaster>();
         
         // Set up drop button
         if (dropButton != null)
@@ -70,6 +72,7 @@ public class SpellUI : MonoBehaviour
             }
             
             // Update stats periodically (in case power changes)
+            // shouldn't this only be done between waves? -Kirsten
             if (Time.frameCount % 30 == 0)
             {
                 UpdateStats();
@@ -85,10 +88,10 @@ public class SpellUI : MonoBehaviour
             int wave = GameManager.Instance.wave;
             
             if (damageText != null)
-                damageText.text = $"DMG: {spell.GetDamage(power, wave)}";
+                damageText.text = $"{spell.GetDamage(power, wave)}";
             
             if (manaText != null)
-                manaText.text = $"MP: {spell.GetManaCost(power, wave)}";
+                manaText.text = $"{spell.GetManaCost(power, wave)}";
         }
     }
     

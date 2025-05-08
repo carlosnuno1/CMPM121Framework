@@ -64,7 +64,7 @@ public class SpellRewardManager : MonoBehaviour
         // Get spell icon
         int iconIndex = currentRewardSpell.GetIcon();
         // Use a placeholder approach since SpellIconManager doesn't have GetIcon method
-        spellIconImage.sprite = Resources.Load<Sprite>($"SpellIcons/icon_{iconIndex}");
+        spellIconImage.sprite = GameManager.Instance.spellIconManager.Get(iconIndex);
         
         // Update stats
         int power = playerCaster.power;

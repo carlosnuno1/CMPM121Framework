@@ -572,6 +572,7 @@ MonoBehaviour:
   manaText: {fileID: 0}
   cooldownImage: {fileID: 0}
   dropButton: {fileID: 0}
+  player: {fileID: 0}
 --- !u!114 &96316930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2145,6 +2146,7 @@ MonoBehaviour:
   manaText: {fileID: 0}
   cooldownImage: {fileID: 0}
   dropButton: {fileID: 0}
+  player: {fileID: 0}
 --- !u!114 &457295005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4004,6 +4006,7 @@ MonoBehaviour:
   manaText: {fileID: 0}
   cooldownImage: {fileID: 0}
   dropButton: {fileID: 0}
+  player: {fileID: 0}
 --- !u!114 &797691356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5294,6 +5297,7 @@ MonoBehaviour:
   manaText: {fileID: 0}
   cooldownImage: {fileID: 0}
   dropButton: {fileID: 0}
+  player: {fileID: 0}
 --- !u!114 &1202500012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58369,8 +58373,9 @@ MonoBehaviour:
   nameText: {fileID: 0}
   damageText: {fileID: 982783696}
   manaText: {fileID: 400786126}
-  cooldownImage: {fileID: 1669142558}
+  cooldownImage: {fileID: 1669142557}
   dropButton: {fileID: 672798490}
+  player: {fileID: 1718273950}
 --- !u!114 &2085212186
 MonoBehaviour:
   m_ObjectHideFlags: 0
