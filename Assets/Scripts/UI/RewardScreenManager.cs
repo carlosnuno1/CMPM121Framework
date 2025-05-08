@@ -8,6 +8,11 @@ public class RewardScreenManager : MonoBehaviour
     public GameObject MainMenuButton;
     public GameObject NextWaveButton;
 
+
+    // to instantiate
+    public GameObject button;
+    public GameObject sprite;
+
     void Awake()
     {        
         if (waveText == null && rewardUI != null)

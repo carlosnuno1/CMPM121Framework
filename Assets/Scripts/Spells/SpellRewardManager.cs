@@ -70,8 +70,8 @@ public class SpellRewardManager : MonoBehaviour
         int power = playerCaster.power;
         int wave = GameManager.Instance.wave;
         
-        damageText.text = $"Damage: {currentRewardSpell.GetDamage(power, wave)}";
-        manaText.text = $"Mana: {currentRewardSpell.GetManaCost(power, wave)}";
+        damageText.text = $"{currentRewardSpell.GetDamage(power, wave)}";
+        manaText.text = $"{currentRewardSpell.GetManaCost(power, wave)}";
         cooldownText.text = $"Cooldown: {currentRewardSpell.GetCooldown():F1}s";
         
         // Show the panel

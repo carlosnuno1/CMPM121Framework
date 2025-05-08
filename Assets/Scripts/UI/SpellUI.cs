@@ -8,7 +8,7 @@ public class SpellUI : MonoBehaviour
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI damageText;
     public TextMeshProUGUI manaText;
-    public Image cooldownImage;
+    public RectTransform cooldownImage;
     public Button dropButton;
     
     private Spell spell;
@@ -41,9 +41,7 @@ public class SpellUI : MonoBehaviour
         {
             int iconIndex = spell.GetIcon();
             // Check how to get the icon from the icon index
-            // icon.sprite = GameManager.Instance.spellIconManager.GetIcon(iconIndex);
-            // For now, let's use a placeholder approach
-            icon.sprite = Resources.Load<Sprite>($"SpellIcons/icon_{iconIndex}");
+            icon.sprite = GameManager.Instance.spellIconManager.Get(iconIndex);
         }
         
         // Update stats
@@ -68,7 +66,7 @@ public class SpellUI : MonoBehaviour
                 float timeSinceLastCast = Time.time - spell.GetLastCastTime();
                 float cooldownRemaining = Mathf.Max(0, cooldownTime - timeSinceLastCast);
                 float cooldownPercentage = Mathf.Clamp01(cooldownRemaining / cooldownTime);
-                cooldownImage.fillAmount = cooldownPercentage;
+                cooldownImage.sizeDelta = new Vector2(48 * cooldownPercentage, 48);
             }
             
             // Update stats periodically (in case power changes)

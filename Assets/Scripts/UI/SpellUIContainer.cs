@@ -4,14 +4,16 @@ using System.Collections.Generic;
 
 public class SpellUIContainer : MonoBehaviour
 {
+    public PlayerController player;
     public SpellUI[] spellUIs;
-    private SpellCaster spellCaster;
+    public SpellCaster spellCaster;
     
     void Start()
     {
-        spellCaster = GetComponent<SpellCaster>();
+        spellCaster = player.gameObject.GetComponent<SpellCaster>();
         
         // Initialize spell UIs
+        spellUIs = gameObject.GetComponentsInChildren<SpellUI>(true); // these disappear at runtime? so im adding them back here
         UpdateSpellUI();
     }
     
