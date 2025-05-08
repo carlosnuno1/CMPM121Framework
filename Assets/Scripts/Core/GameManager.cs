@@ -116,7 +116,7 @@ public class GameManager
         UpdatePower();
         
         // Update player stats based on wave number
-        UpdatePlayerStats();
+        //UpdatePlayerStats(); (currently doing this in playercontroller)
         
         // Change state to COUNTDOWN
         state = GameState.COUNTDOWN;

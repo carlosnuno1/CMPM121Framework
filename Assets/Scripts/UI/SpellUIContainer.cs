@@ -21,6 +21,7 @@ public class SpellUIContainer : MonoBehaviour
     {
         // Get the list of spells from the SpellCaster
         List<Spell> spells = new List<Spell>();
+        Debug.Log(spellCaster.GetSpellCount());
         for (int i = 0; i < spellCaster.GetSpellCount(); i++)
         {
             spells.Add(spellCaster.GetSpell(i));

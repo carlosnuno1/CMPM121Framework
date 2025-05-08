@@ -26,7 +26,11 @@ public class SpellRewardManager : MonoBehaviour
     public SpellUI[] spellSelectionUIs;
     
     private Spell currentRewardSpell;
-    private SpellCaster playerCaster;
+
+    // there should be a better way of getting these at runtime
+    public SpellCaster playerCaster;
+    public SpellUIContainer container;
+    public EnemySpawner enemyspawner;
 
     private int spellcheck; // to make sure you only generate 1 spell per wave break
     
@@ -38,13 +42,18 @@ public class SpellRewardManager : MonoBehaviour
             spellSelectionPanel.SetActive(false);
         
         // Get reference to player's spell caster
-        playerCaster = GameManager.Instance.player.GetComponent<SpellCaster>();
+        //playerCaster = GameManager.Instance.player.GetComponent<SpellCaster>();
         
         // Set up button listeners
+        // not needed! this is handled by the button gameobject functionality -kirsten
+        /*
         acceptButton.onClick.AddListener(AcceptSpell);
         rejectButton.onClick.AddListener(RejectSpell);
+        */
         
         // Set up spell selection buttons
+        // not needed! we can just tell the player to drop an existing spell first
+        /*
         if (spellSelectionButtons != null)
         {
             for (int i = 0; i < spellSelectionButtons.Length; i++)
@@ -53,6 +62,7 @@ public class SpellRewardManager : MonoBehaviour
                 spellSelectionButtons[i].onClick.AddListener(() => ReplaceSpell(index));
             }
         }
+        */
         spellcheck = 0;
     }
     // Update is called once per frame
@@ -73,6 +83,9 @@ public class SpellRewardManager : MonoBehaviour
             rewardPanel.SetActive(true);
             MainMenuButton.SetActive(false);
             if (spellcheck == 0) {
+                
+                // Get reference to player's spell caster
+                playerCaster = GameManager.Instance.player.GetComponent<SpellCaster>();
                 spellcheck = 1;
                 ShowSpellReward();
             }
@@ -123,13 +136,13 @@ public class SpellRewardManager : MonoBehaviour
         Time.timeScale = 0;
     }
     
-    private void AcceptSpell()
+    public void AcceptSpell()
     {
         // Check if player has room for another spell
         if (playerCaster.GetSpellCount() >= 4)
         {
             // Player already has max spells, show spell selection UI
-            ShowSpellSelectionUI();
+            //ShowSpellSelectionUI();
         }
         else
         {
@@ -139,7 +152,7 @@ public class SpellRewardManager : MonoBehaviour
         }
     }
     
-    private void RejectSpell()
+    public void RejectSpell()
     {
         // Simply close the panel and continue to next wave
         CloseRewardPanel();
@@ -154,9 +167,10 @@ public class SpellRewardManager : MonoBehaviour
         Time.timeScale = 1;
         
         // Continue to next wave
-        GameManager.Instance.StartNextWave();
+        enemyspawner.NextWave();
+        //GameManager.Instance.StartNextWave();
     }
-    
+/*
     private void ShowSpellSelectionUI()
     {
         // Hide the reward panel
@@ -201,6 +215,7 @@ public class SpellRewardManager : MonoBehaviour
             GameManager.Instance.StartNextWave();
         }
     }
+*/
     
     private void AddSpellToPlayer(Spell spell)
     {
@@ -214,7 +229,7 @@ public class SpellRewardManager : MonoBehaviour
     private void UpdateSpellUI()
     {
         // Find and update the spell UI container
-        SpellUIContainer container = GameManager.Instance.player.GetComponent<SpellUIContainer>();
+        //SpellUIContainer container = GameManager.Instance.player.GetComponent<SpellUIContainer>();
         if (container != null)
         {
             container.UpdateSpellUI();
