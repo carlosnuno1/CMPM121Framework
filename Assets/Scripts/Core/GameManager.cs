@@ -81,7 +81,7 @@ public class GameManager
     // Reference to the SpellRewardManager
     private SpellRewardManager spellRewardManager;
 
-    void Start()
+    void Start() // lol um this isnt a monobehaviour so it doesnt call start -kirsten
     {
         // Find the SpellRewardManager
         spellRewardManager = UnityEngine.Object.FindAnyObjectByType<SpellRewardManager>();

@@ -9,6 +9,7 @@ public class SpellRewardManager : MonoBehaviour
     public GameObject rewardPanel;
     public TextMeshProUGUI spellNameText;
     public TextMeshProUGUI spellDescriptionText;
+    public SpellUI demoSpell;
     public Image spellIconImage;
     public TextMeshProUGUI damageText;
     public TextMeshProUGUI manaText;
@@ -17,6 +18,7 @@ public class SpellRewardManager : MonoBehaviour
     [Header("Buttons")]
     public Button acceptButton;
     public Button rejectButton;
+    public GameObject MainMenuButton;
     
     [Header("Spell Selection")]
     public GameObject spellSelectionPanel;
@@ -25,6 +27,8 @@ public class SpellRewardManager : MonoBehaviour
     
     private Spell currentRewardSpell;
     private SpellCaster playerCaster;
+
+    private int spellcheck; // to make sure you only generate 1 spell per wave break
     
     void Start()
     {
@@ -49,11 +53,46 @@ public class SpellRewardManager : MonoBehaviour
                 spellSelectionButtons[i].onClick.AddListener(() => ReplaceSpell(index));
             }
         }
+        spellcheck = 0;
+    }
+    // Update is called once per frame
+    void Update()
+    {
+
+        if (rewardPanel == null)
+        {
+            return;
+        }
+        if (GameManager.Instance.state == GameManager.GameState.GAMEWIN)
+        {
+            rewardPanel.SetActive(true);
+            MainMenuButton.SetActive(true);
+        }
+        else if (GameManager.Instance.state == GameManager.GameState.WAVEEND)
+        {
+            rewardPanel.SetActive(true);
+            MainMenuButton.SetActive(false);
+            if (spellcheck == 0) {
+                spellcheck = 1;
+                ShowSpellReward();
+            }
+        }
+        else if (GameManager.Instance.state == GameManager.GameState.GAMEOVER)
+        {
+            rewardPanel.SetActive(true);
+            MainMenuButton.SetActive(true);
+        }
+        else
+        {
+            rewardPanel.SetActive(false);
+            spellcheck = 0;
+        }
     }
     
     // This method can be called from GameManager when a wave is completed
     public void ShowSpellReward()
     {
+        Debug.Log("Generating Spell Reward");
         // Generate a random spell
         currentRewardSpell = SpellBuilder.BuildRandom(playerCaster);
         
@@ -61,6 +100,7 @@ public class SpellRewardManager : MonoBehaviour
         spellNameText.text = currentRewardSpell.GetName();
         spellDescriptionText.text = currentRewardSpell.GetDescription();
         
+        /*
         // Get spell icon
         int iconIndex = currentRewardSpell.GetIcon();
         // Use a placeholder approach since SpellIconManager doesn't have GetIcon method
@@ -72,7 +112,9 @@ public class SpellRewardManager : MonoBehaviour
         
         damageText.text = $"{currentRewardSpell.GetDamage(power, wave)}";
         manaText.text = $"{currentRewardSpell.GetManaCost(power, wave)}";
+        */
         cooldownText.text = $"Cooldown: {currentRewardSpell.GetCooldown():F1}s";
+        demoSpell.SetSpell(currentRewardSpell, 0);
         
         // Show the panel
         rewardPanel.SetActive(true);
