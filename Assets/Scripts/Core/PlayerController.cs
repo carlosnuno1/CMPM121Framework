@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     public ManaBar manaui;
 
     public SpellCaster spellcaster;
-    public SpellUI spellui;
+    public SpellUIContainer spelluicontainer;
 
     public float speed = 5;
 
@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
         healthui.SetHealth(hp);
         rewardScreenManager.SetHealth(hp);
         manaui.SetSpellCaster(spellcaster);
-        spellui.SetSpell(spellcaster.spell);
+        //spelluicontainer.spellUIs[0].SetSpell(spellcaster.spell);
     }
 
     // Add this method back for EnemySpawner
@@ -100,10 +100,26 @@ public class PlayerController : MonoBehaviour
     }
     void SwitchSpell()
     {
-        if(Input.GetKeyDown(KeyCode.Alpha1) && spellcaster.GetSpellCount() > 0) spellcaster.spell = spellcaster.GetSpell(0);
-        if(Input.GetKeyDown(KeyCode.Alpha2) && spellcaster.GetSpellCount() > 1) spellcaster.spell = spellcaster.GetSpell(1);
-        if(Input.GetKeyDown(KeyCode.Alpha3) && spellcaster.GetSpellCount() > 2) spellcaster.spell = spellcaster.GetSpell(2);
-        if(Input.GetKeyDown(KeyCode.Alpha4) && spellcaster.GetSpellCount() > 3) spellcaster.spell = spellcaster.GetSpell(3);
+        if(Input.GetKeyDown(KeyCode.Alpha1) && spellcaster.GetSpellCount() > 0)
+        {
+            spellcaster.spell = spellcaster.GetSpell(0);
+            spelluicontainer.SwitchHighlight(0);
+        }
+        if(Input.GetKeyDown(KeyCode.Alpha2) && spellcaster.GetSpellCount() > 1)
+        {
+            spellcaster.spell = spellcaster.GetSpell(1);
+            spelluicontainer.SwitchHighlight(1);
+        }
+        if(Input.GetKeyDown(KeyCode.Alpha3) && spellcaster.GetSpellCount() > 2)
+        {
+            spellcaster.spell = spellcaster.GetSpell(2);
+            spelluicontainer.SwitchHighlight(2);
+        }
+        if(Input.GetKeyDown(KeyCode.Alpha4) && spellcaster.GetSpellCount() > 3)
+        {
+            spellcaster.spell = spellcaster.GetSpell(3);
+            spelluicontainer.SwitchHighlight(3);
+        }
     }
 
     public void OnMove(InputValue value)

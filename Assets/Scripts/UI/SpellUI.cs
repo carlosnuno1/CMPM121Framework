@@ -10,6 +10,7 @@ public class SpellUI : MonoBehaviour
     public TextMeshProUGUI manaText;
     public RectTransform cooldownImage;
     public Button dropButton;
+    public GameObject highlight;
 
     public GameObject player;
     

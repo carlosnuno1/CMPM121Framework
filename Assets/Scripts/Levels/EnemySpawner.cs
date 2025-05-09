@@ -19,6 +19,8 @@ public class EnemySpawner : MonoBehaviour
     public int current_wave;
     public string current_level;
 
+    private int spawns; // for preventing early wave ends when still spawning
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -104,12 +106,14 @@ public class EnemySpawner : MonoBehaviour
         }
         GameManager.Instance.state = GameManager.GameState.INWAVE;
         
+        spawns = 0;
         // spawn each type of monster simultaneously (separate coroutines)
         foreach (Spawn s in level_types[current_level].spawns)
         {
+            spawns = spawns + 1;
             StartCoroutine(SpawnEnemyType(s));
         }
-        yield return new WaitForSeconds(1f); // temporary, to prevent player from ending wave early by killing early spawns
+        yield return new WaitWhile(() => spawns > 0);
         yield return new WaitWhile(() => GameManager.Instance.enemy_count > 0);
         if (GameManager.Instance.state != GameManager.GameState.GAMEOVER)
         {
@@ -147,6 +151,7 @@ public class EnemySpawner : MonoBehaviour
             sequence_pointer = (sequence_pointer + 1) % sequence.Count();
             i = i + amt;
         }
+        spawns = spawns - 1;
     }
     private SpawnPoint EvaluateSpawnLocation(string s)
     {

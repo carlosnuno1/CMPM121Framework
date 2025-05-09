@@ -56,4 +56,18 @@ public class SpellUIContainer : MonoBehaviour
             UpdateSpellUI();
         }
     }
+    public void SwitchHighlight(int index)
+    {
+        // Check if the index is valid
+        if (index >= 0 && index < spellCaster.GetSpellCount())
+        {
+            // set everything else to unhighlighted
+            for (int i = 0; i < spellCaster.GetSpellCount(); i++)
+            {
+                spellUIs[i].highlight.SetActive(false);
+            }
+            // highlight the spell
+            spellUIs[index].highlight.SetActive(true);
+        }
+    }
 }

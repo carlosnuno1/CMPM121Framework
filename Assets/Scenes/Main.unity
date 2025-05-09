@@ -3153,7 +3153,7 @@ MonoBehaviour:
   healthui: {fileID: 765025204}
   manaui: {fileID: 71109453}
   spellcaster: {fileID: 0}
-  spellui: {fileID: 2085212185}
+  spelluicontainer: {fileID: 1982188287}
   speed: 5
   unit: {fileID: 0}
 --- !u!4 &1718273953
@@ -54081,17 +54081,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7256482467319955642, guid: 4a55d885daf8cd3409bfd222ff101640, type: 3}
   m_PrefabInstance: {fileID: 3038067786048781228}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2085212185 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2270881493936095364, guid: 4a55d885daf8cd3409bfd222ff101640, type: 3}
-  m_PrefabInstance: {fileID: 3038067786048781228}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2085212183}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2241b04a7862be447a62c9acb60823e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &2306492998223050676
 PrefabInstance:
   m_ObjectHideFlags: 0

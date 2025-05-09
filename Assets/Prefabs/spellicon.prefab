@@ -303,7 +303,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5047216449844002107
 RectTransform:
   m_ObjectHideFlags: 0
@@ -584,7 +584,8 @@ MonoBehaviour:
   manaText: {fileID: 5036088320787788978}
   cooldownImage: {fileID: 9126794850548546951}
   dropButton: {fileID: 8662225104693426336}
-  player: {fileID: 0}
+  highlight: {fileID: 5019288285849861224}
+  player: {fileID: 5019288285849861224}
 --- !u!1 &6869178279252784972
 GameObject:
   m_ObjectHideFlags: 0
