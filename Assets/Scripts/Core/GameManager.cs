@@ -78,6 +78,7 @@ public class GameManager
         }
     }
 
+    /*
     // Reference to the SpellRewardManager
     private SpellRewardManager spellRewardManager;
 
@@ -156,4 +157,5 @@ public class GameManager
         // Player speed remains constant at 5
         // If you have a movement component, you could set it here
     }
+    */
 }

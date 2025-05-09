@@ -8,7 +8,6 @@ using System.Collections.Generic;
 public class PlayerController : MonoBehaviour
 {
     public Hittable hp;
-    public RewardScreenManager rewardScreenManager;
     public HealthBar healthui;
     public ManaBar manaui;
 
@@ -47,9 +46,7 @@ public class PlayerController : MonoBehaviour
 
         // tell UI elements what to show
         healthui.SetHealth(hp);
-        rewardScreenManager.SetHealth(hp);
         manaui.SetSpellCaster(spellcaster);
-        //spelluicontainer.spellUIs[0].SetSpell(spellcaster.spell);
     }
 
     // Add this method back for EnemySpawner
@@ -87,7 +84,6 @@ public class PlayerController : MonoBehaviour
 
         // Switch active spell
         SwitchSpell();
-        //spellcaster.spell = spellcaster.GetSpell(1);
 
         // Cast spell on left click
         if (Input.GetMouseButtonDown(0) && spellcaster != null)  // Changed from GetMouseButton to GetMouseButtonDown

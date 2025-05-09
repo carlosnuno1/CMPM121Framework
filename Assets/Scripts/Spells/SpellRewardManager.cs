@@ -10,22 +10,12 @@ public class SpellRewardManager : MonoBehaviour
     public TextMeshProUGUI spellNameText;
     public TextMeshProUGUI spellDescriptionText;
     public SpellUI demoSpell;
-    public Image spellIconImage;
-    public TextMeshProUGUI damageText;
-    public TextMeshProUGUI manaText;
     public TextMeshProUGUI cooldownText;
-    
+
     [Header("Buttons")]
     public Button acceptButton;
     public Button rejectButton;
     public GameObject MainMenuButton;
-    
-    [Header("Spell Selection")]
-    public GameObject spellSelectionPanel;
-    public Button[] spellSelectionButtons;
-    public SpellUI[] spellSelectionUIs;
-    
-    private Spell currentRewardSpell;
 
     // there should be a better way of getting these at runtime
     public SpellCaster playerCaster;
@@ -33,36 +23,12 @@ public class SpellRewardManager : MonoBehaviour
     public EnemySpawner enemyspawner;
 
     private int spellcheck; // to make sure you only generate 1 spell per wave break
-    
+    private Spell currentRewardSpell;
+
     void Start()
     {
         // Hide the panels initially
         rewardPanel.SetActive(false);
-        if (spellSelectionPanel != null)
-            spellSelectionPanel.SetActive(false);
-        
-        // Get reference to player's spell caster
-        //playerCaster = GameManager.Instance.player.GetComponent<SpellCaster>();
-        
-        // Set up button listeners
-        // not needed! this is handled by the button gameobject functionality -kirsten
-        /*
-        acceptButton.onClick.AddListener(AcceptSpell);
-        rejectButton.onClick.AddListener(RejectSpell);
-        */
-        
-        // Set up spell selection buttons
-        // not needed! we can just tell the player to drop an existing spell first
-        /*
-        if (spellSelectionButtons != null)
-        {
-            for (int i = 0; i < spellSelectionButtons.Length; i++)
-            {
-                int index = i; // Capture the index for the lambda
-                spellSelectionButtons[i].onClick.AddListener(() => ReplaceSpell(index));
-            }
-        }
-        */
         spellcheck = 0;
     }
     // Update is called once per frame
@@ -115,20 +81,6 @@ public class SpellRewardManager : MonoBehaviour
         // Update UI with spell details
         spellNameText.text = currentRewardSpell.GetName();
         spellDescriptionText.text = currentRewardSpell.GetDescription();
-        
-        /*
-        // Get spell icon
-        int iconIndex = currentRewardSpell.GetIcon();
-        // Use a placeholder approach since SpellIconManager doesn't have GetIcon method
-        spellIconImage.sprite = GameManager.Instance.spellIconManager.Get(iconIndex);
-        
-        // Update stats
-        int power = playerCaster.power;
-        int wave = GameManager.Instance.wave;
-        
-        damageText.text = $"{currentRewardSpell.GetDamage(power, wave)}";
-        manaText.text = $"{currentRewardSpell.GetManaCost(power, wave)}";
-        */
         cooldownText.text = $"Cooldown: {currentRewardSpell.GetCooldown():F1}s";
         demoSpell.SetSpell(currentRewardSpell, 0);
         
@@ -144,8 +96,7 @@ public class SpellRewardManager : MonoBehaviour
         // Check if player has room for another spell
         if (playerCaster.GetSpellCount() >= 4)
         {
-            // Player already has max spells, show spell selection UI
-            //ShowSpellSelectionUI();
+            // Player already has max spells, tell them to drop a spell
         }
         else
         {
@@ -173,53 +124,7 @@ public class SpellRewardManager : MonoBehaviour
         enemyspawner.NextWave();
         //GameManager.Instance.StartNextWave();
     }
-/*
-    private void ShowSpellSelectionUI()
-    {
-        // Hide the reward panel
-        rewardPanel.SetActive(false);
-        
-        // Show the spell selection panel
-        spellSelectionPanel.SetActive(true);
-        
-        // Update the spell selection UIs to show current spells
-        for (int i = 0; i < spellSelectionUIs.Length; i++)
-        {
-            if (i < playerCaster.GetSpellCount())
-            {
-                Spell spell = playerCaster.GetSpell(i);
-                spellSelectionUIs[i].gameObject.SetActive(true);
-                spellSelectionUIs[i].SetSpell(spell, i);
-            }
-            else
-            {
-                spellSelectionUIs[i].gameObject.SetActive(false);
-            }
-        }
-    }
-    
-    private void ReplaceSpell(int index)
-    {
-        // Replace the selected spell with the new one
-        if (index >= 0 && index < playerCaster.GetSpellCount())
-        {
-            playerCaster.ReplaceSpell(index, currentRewardSpell);
-            
-            // Update the UI
-            UpdateSpellUI();
-            
-            // Close the selection panel
-            spellSelectionPanel.SetActive(false);
-            
-            // Resume the game
-            Time.timeScale = 1;
-            
-            // Continue to next wave
-            GameManager.Instance.StartNextWave();
-        }
-    }
-*/
-    
+
     private void AddSpellToPlayer(Spell spell)
     {
         // Add the spell to the player's spell list

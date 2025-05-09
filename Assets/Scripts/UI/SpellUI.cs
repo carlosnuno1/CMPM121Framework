@@ -73,7 +73,6 @@ public class SpellUI : MonoBehaviour
             }
             
             // Update stats periodically (in case power changes)
-            // shouldn't this only be done between waves? -Kirsten
             if (Time.frameCount % 30 == 0)
             {
                 UpdateStats();

@@ -231,7 +231,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 220180078}
-  - component: {fileID: 220180077}
   - component: {fileID: 220180079}
   m_Layer: 0
   m_Name: RewardManager
@@ -240,24 +239,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &220180077
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 220180076}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 889e30827d3de8847b0caf6a2d04eb83, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rewardUI: {fileID: 1709288111}
-  waveText: {fileID: 1167482366}
-  MainMenuButton: {fileID: 637351560}
-  NextWaveButton: {fileID: 284566016}
-  button: {fileID: 6791571272867747119, guid: 47865e4d0d1669541a3aa2992225a687, type: 3}
-  sprite: {fileID: 6893667880917326860, guid: 7ca432ceb7bb94b4c85dd1d42dba15ea, type: 3}
 --- !u!4 &220180078
 Transform:
   m_ObjectHideFlags: 0
@@ -2829,7 +2810,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5952906948887710570, guid: 4a55d885daf8cd3409bfd222ff101640, type: 3}
       propertyPath: m_Name
-      value: demospell
+      value: new spell
       objectReference: {fileID: 0}
     - target: {fileID: 7256482467319955642, guid: 4a55d885daf8cd3409bfd222ff101640, type: 3}
       propertyPath: m_Pivot.x
@@ -3036,7 +3017,6 @@ GameObject:
   - component: {fileID: 1709288114}
   - component: {fileID: 1709288113}
   - component: {fileID: 1709288112}
-  - component: {fileID: 1709288115}
   m_Layer: 5
   m_Name: RewardScreen
   m_TagString: Untagged
@@ -3103,24 +3083,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -400, y: -80}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1709288115
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1709288111}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 889e30827d3de8847b0caf6a2d04eb83, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rewardUI: {fileID: 0}
-  waveText: {fileID: 637110998}
-  MainMenuButton: {fileID: 0}
-  NextWaveButton: {fileID: 0}
-  button: {fileID: 0}
-  sprite: {fileID: 0}
 --- !u!1 &1718273950
 GameObject:
   m_ObjectHideFlags: 0
@@ -3184,7 +3146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4ef5265fce1b544c872205988919fb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rewardScreenManager: {fileID: 220180077}
+  rewardScreenManager: {fileID: 0}
   healthui: {fileID: 765025204}
   manaui: {fileID: 71109453}
   spellcaster: {fileID: 0}
@@ -53623,7 +53585,7 @@ GameObject:
   - component: {fileID: 1982188285}
   - component: {fileID: 1982188287}
   m_Layer: 5
-  m_Name: spells
+  m_Name: spells (hotbar)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
