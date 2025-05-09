@@ -46,6 +46,11 @@ public class SpellUI : MonoBehaviour
             // Check how to get the icon from the icon index
             icon.sprite = GameManager.Instance.spellIconManager.Get(iconIndex);
         }
+
+        if (caster == null)
+        {
+            caster = player.GetComponent<SpellCaster>();
+        }
         
         // Update stats
         UpdateStats();

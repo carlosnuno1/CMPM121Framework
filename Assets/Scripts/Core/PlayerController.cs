@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour
         spellcaster.mana_regen = RPNEvaluator.EvaluateRPNFloat("10 wave +", 0, 0, wave);
         // Player spell power to "wave 10 *"
         spellcaster.power = (int)RPNEvaluator.EvaluateRPNFloat("wave 10 *", 0, 0, wave);
+        Debug.Log("Wave: " + wave);
         // Player speed to "5"
         speed = 5;
     }

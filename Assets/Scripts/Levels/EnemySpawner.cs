@@ -84,7 +84,9 @@ public class EnemySpawner : MonoBehaviour
     public void NextWave()
     {
         current_wave = current_wave + 1;
+        GameManager.Instance.NextWave();
         // dont start a new wave if current_wave > level_types[current_level].waves ----------------! todo
+        GameManager.Instance.player.GetComponent<PlayerController>().StartLevel();
         StartCoroutine(SpawnWave());
     }
 

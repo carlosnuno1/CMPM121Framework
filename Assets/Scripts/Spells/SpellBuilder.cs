@@ -97,7 +97,7 @@ public class SpellBuilder
                 return new ArcaneSpraySpell(owner, spellData);
             case "magic_missile":
                 return new MagicMissileSpell(owner, spellData);
-            case "arcane_explosion":
+            case "arcane_blast":
                 return new ArcaneExplosionSpell(owner, spellData);
             case "frost_nova":
                 return new FrostNovaSpell(owner, spellData);

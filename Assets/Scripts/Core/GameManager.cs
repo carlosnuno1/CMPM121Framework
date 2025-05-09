@@ -78,6 +78,10 @@ public class GameManager
         }
     }
 
+    public void NextWave()
+    {
+        wave = wave + 1;
+    }
     /*
     // Reference to the SpellRewardManager
     private SpellRewardManager spellRewardManager;
