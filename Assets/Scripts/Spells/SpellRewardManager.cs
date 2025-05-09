@@ -77,11 +77,13 @@ public class SpellRewardManager : MonoBehaviour
         {
             rewardPanel.SetActive(true);
             MainMenuButton.SetActive(true);
+            spellNameText.gameObject.transform.parent.gameObject.SetActive(false);
         }
         else if (GameManager.Instance.state == GameManager.GameState.WAVEEND)
         {
             rewardPanel.SetActive(true);
             MainMenuButton.SetActive(false);
+            spellNameText.gameObject.transform.parent.gameObject.SetActive(true);
             if (spellcheck == 0) {
                 
                 // Get reference to player's spell caster
@@ -94,6 +96,7 @@ public class SpellRewardManager : MonoBehaviour
         {
             rewardPanel.SetActive(true);
             MainMenuButton.SetActive(true);
+            spellNameText.gameObject.transform.parent.gameObject.SetActive(false);
         }
         else
         {

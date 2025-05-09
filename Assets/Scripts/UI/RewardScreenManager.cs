@@ -1,3 +1,4 @@
+// replaced by SpellRewardManager.cs ... delete this?
 using UnityEngine;
 using TMPro;
 public class RewardScreenManager : MonoBehaviour

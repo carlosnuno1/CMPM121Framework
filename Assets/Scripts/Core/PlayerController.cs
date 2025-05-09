@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
         }
     }
     void SwitchSpell()
-    {
+    { // theres probably a nicer way to format this. like a switch statement -kirsten
         if(Input.GetKeyDown(KeyCode.Alpha1) && spellcaster.GetSpellCount() > 0)
         {
             spellcaster.spell = spellcaster.GetSpell(0);
