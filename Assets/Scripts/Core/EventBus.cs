@@ -15,10 +15,21 @@ public class EventBus
     }
 
     public event Action<Vector3, Damage, Hittable> OnDamage;
-    
+
     public void DoDamage(Vector3 where, Damage dmg, Hittable target)
     {
         OnDamage?.Invoke(where, dmg, target);
+    }
+
+    //public event Action OnKill;
+    //public event Action<Vector3, float> StandStill;
+    //public event Action Move;
+    //public event Action CastSpell;
+
+    public event Action<Relic> OnRelicPickup;
+    public void PickupRelic(Relic r)
+    {
+        OnRelicPickup?.Invoke(r);
     }
 
 }

@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 aim;
     private bool casting;
 
+    public List<Relic> relics;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -43,6 +45,9 @@ public class PlayerController : MonoBehaviour
         hp = new Hittable(100, Hittable.Team.PLAYER, gameObject);
         hp.OnDeath += Die;
         hp.team = Hittable.Team.PLAYER;
+
+        // initialize relics
+        relics = new List<Relic>();
 
         // tell UI elements what to show
         healthui.SetHealth(hp);
@@ -137,5 +142,11 @@ public class PlayerController : MonoBehaviour
     void Die()
     {
         GameManager.Instance.state = GameManager.GameState.GAMEOVER;
+    }
+
+    public void PickupRelic(Relic r)
+    {
+        relics.Add(r);
+        EventBus.Instance.PickupRelic(r);
     }
 }

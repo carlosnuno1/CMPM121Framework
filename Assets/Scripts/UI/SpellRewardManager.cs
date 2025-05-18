@@ -11,6 +11,7 @@ public class SpellRewardManager : MonoBehaviour
     public TextMeshProUGUI spellDescriptionText;
     public SpellUI demoSpell;
     public TextMeshProUGUI cooldownText;
+    public GameObject relicRewardPanel;
 
     [Header("Buttons")]
     public Button acceptButton;
@@ -24,6 +25,7 @@ public class SpellRewardManager : MonoBehaviour
 
     private int spellcheck; // to make sure you only generate 1 spell per wave break
     private Spell currentRewardSpell;
+    private Relic[] generatedRelics;
 
     void Start()
     {
@@ -49,9 +51,9 @@ public class SpellRewardManager : MonoBehaviour
         {
             rewardPanel.SetActive(true);
             MainMenuButton.SetActive(false);
-            spellNameText.gameObject.transform.parent.gameObject.SetActive(true);
             if (spellcheck == 0) {
-                
+                spellNameText.gameObject.transform.parent.gameObject.SetActive(true); // show the spell reward
+                relicRewardPanel.SetActive(false); // hide the relic reward
                 // Get reference to player's spell caster
                 playerCaster = GameManager.Instance.player.GetComponent<SpellCaster>();
                 spellcheck = 1;
@@ -63,6 +65,7 @@ public class SpellRewardManager : MonoBehaviour
             rewardPanel.SetActive(true);
             MainMenuButton.SetActive(true);
             spellNameText.gameObject.transform.parent.gameObject.SetActive(false);
+            relicRewardPanel.SetActive(false);
         }
         else
         {
@@ -102,27 +105,14 @@ public class SpellRewardManager : MonoBehaviour
         {
             // Add the spell directly
             AddSpellToPlayer(currentRewardSpell);
-            CloseRewardPanel();
+            ShowRelicReward();
         }
     }
     
     public void RejectSpell()
     {
         // Simply close the panel and continue to next wave
-        CloseRewardPanel();
-    }
-    
-    private void CloseRewardPanel()
-    {
-        // Hide the panel
-        rewardPanel.SetActive(false);
-        
-        // Resume the game
-        Time.timeScale = 1;
-        
-        // Continue to next wave
-        enemyspawner.NextWave();
-        //GameManager.Instance.StartNextWave();
+        ShowRelicReward();
     }
 
     private void AddSpellToPlayer(Spell spell)
@@ -142,5 +132,57 @@ public class SpellRewardManager : MonoBehaviour
         {
             container.UpdateSpellUI();
         }
+    }
+
+    private void ShowRelicReward()
+    {
+        // hide the spell reward panel
+        spellNameText.gameObject.transform.parent.gameObject.SetActive(false);
+    
+        // generate relics
+        Debug.Log("Generating Relic Rewards");
+        generatedRelics = RelicBuilder.GenerateRelics();
+        
+        // Update UI with relic details
+        // for each relic reward prefab in children
+        var rewardDisplays = relicRewardPanel.GetComponentsInChildren<RelicRewardIconManager>();
+        int i = 0;
+        foreach (RelicRewardIconManager r in rewardDisplays)
+        {
+            // update ui
+            r.relic = generatedRelics[i];
+            r.UpdateUI();
+            i = i + 1;
+            Debug.Log(r.relic.name);
+        }
+        
+        // show the relic reward
+        relicRewardPanel.SetActive(true);
+    }
+
+    public void TakeRelic(int index)
+    {
+        // add the indexed relic to player
+        GameManager.Instance.player.GetComponent<PlayerController>().PickupRelic(generatedRelics[index]);
+        relicRewardPanel.SetActive(false);
+        CloseRewardPanel();
+    }
+    public void RejectRelic()
+    {
+        relicRewardPanel.SetActive(false);
+        CloseRewardPanel();
+    }
+    
+    private void CloseRewardPanel()
+    {
+        // Hide the panel
+        rewardPanel.SetActive(false);
+        
+        // Resume the game
+        Time.timeScale = 1;
+        
+        // Continue to next wave
+        enemyspawner.NextWave();
+        //GameManager.Instance.StartNextWave();
     }
 }
