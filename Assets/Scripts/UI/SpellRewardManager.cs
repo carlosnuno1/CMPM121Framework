@@ -142,6 +142,11 @@ public class SpellRewardManager : MonoBehaviour
         // generate relics
         Debug.Log("Generating Relic Rewards");
         generatedRelics = RelicBuilder.GenerateRelics();
+        if (generatedRelics[0] == null)
+        {
+            CloseRewardPanel();
+            return;
+        }
         
         // Update UI with relic details
         // for each relic reward prefab in children
@@ -153,7 +158,6 @@ public class SpellRewardManager : MonoBehaviour
             r.relic = generatedRelics[i];
             r.UpdateUI();
             i = i + 1;
-            Debug.Log(r.relic.name);
         }
         
         // show the relic reward
@@ -164,6 +168,7 @@ public class SpellRewardManager : MonoBehaviour
     {
         // add the indexed relic to player
         GameManager.Instance.player.GetComponent<PlayerController>().PickupRelic(generatedRelics[index]);
+        generatedRelics[index].StartListening();
         relicRewardPanel.SetActive(false);
         CloseRewardPanel();
     }

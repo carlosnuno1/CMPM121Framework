@@ -8,10 +8,11 @@ public class Relic
     public int sprite;
     public Trigger trigger;
     public Effect effect;
+    public bool active = false;
 
     public string GetLabel()
     {
-        return "100";
+        return "";
     }
     public string GetName()
     {
@@ -23,30 +24,106 @@ public class Relic
     }
     public bool IsActive()
     {
-        return false;
+        return active;
     }
 
-    public void DoEffect()
+    public void StartListening() // have the relic listen for its trigger
     {
-        switch (effect.type)
+        switch (trigger.type)
         {
-            case "gain-mana":
-                GainMana(effect.amount);
+            case "take-damage":
+                EventBus.Instance.OnTakeDamage += DoEffect;
                 return;
-            case "gain-spellpower":
-                GainSpellpower(effect.amount);
+            case "stand-still":
+                EventBus.Instance.OnStandStill += DoEffect;
+                return;
+            case "on-kill":
+                EventBus.Instance.OnKill += DoEffect;
                 return;
             default:
                 // uh oh
                 return;
         }
     }
-    private void GainMana(string amount)
+    public void DoEffect()
     {
-        //
+        EffectType();
     }
-    private void GainSpellpower(string amount)
+
+    public void DoEffect(int amount)
     {
-        //
+        // check if it satisfies additional trigger conditions
+        if (trigger.amount != null &&
+            RPNEvaluator.EvaluateRPN(trigger.amount, 0, GameManager.Instance.wave) > amount)
+        {
+            return;
+        }
+        EffectType();
+    }
+    private void EffectType()
+    {
+        switch (effect.type)
+        {
+            case "gain-mana":
+                GainMana();
+                return;
+            case "gain-spellpower":
+                GainSpellpower();
+                return;
+            default:
+                // uh oh
+                return;
+        }
+    }
+    private void GainMana()
+    {
+        GameManager.Instance.player.GetComponent<SpellCaster>().mana += RPNEvaluator.EvaluateRPN(effect.amount, 0, GameManager.Instance.wave);
+    }
+    private void GainSpellpower()
+    {
+        if (!IsActive())
+        {
+            active = true;
+            GameManager.Instance.player.GetComponent<SpellCaster>().power += RPNEvaluator.EvaluateRPN(effect.amount, 0, GameManager.Instance.wave);
+            switch (effect.until)
+            {
+                case "move":
+                    EventBus.Instance.OnMove += Deactivate;
+                    break;
+                case "cast-spell":
+                    EventBus.Instance.OnCastSpell += Deactivate;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    private void Deactivate()
+    {
+        if (IsActive())
+        {
+            active = false;
+            switch (effect.until)
+            {
+                case "move":
+                    EventBus.Instance.OnMove -= Deactivate;
+                    break;
+                case "cast-spell":
+                    EventBus.Instance.OnCastSpell -= Deactivate;
+                    break;
+                default:
+                    break;
+            }
+            switch (effect.type)
+            {
+                case "gain-mana":
+                    return;
+                case "gain-spellpower":
+                    GameManager.Instance.player.GetComponent<SpellCaster>().power -= RPNEvaluator.EvaluateRPN(effect.amount, 0, GameManager.Instance.wave); // what if this happens between waves?
+                    return;
+                default:
+                    return;
+            }
+        }
     }
 }

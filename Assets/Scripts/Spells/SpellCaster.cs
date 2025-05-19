@@ -51,6 +51,7 @@ public class SpellCaster : MonoBehaviour
         mana -= manaCost;
         
         StartCoroutine(spell.Cast(where, target, team));
+        EventBus.Instance.DoCastSpell();
         
         return true;
     }

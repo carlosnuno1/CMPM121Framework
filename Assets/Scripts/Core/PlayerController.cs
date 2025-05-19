@@ -24,6 +24,8 @@ public class PlayerController : MonoBehaviour
 
     public List<Relic> relics;
 
+    private float timeStill;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -87,6 +89,19 @@ public class PlayerController : MonoBehaviour
     {
         // Movement
         transform.Translate(movement * speed * Time.deltaTime);
+        // keep track of if you haven't been moving
+        if (movement.magnitude > 0)
+        {
+            if (timeStill > 0)
+            {
+                timeStill = 0;
+                EventBus.Instance.DoMove();
+            }
+        } else
+        {
+            timeStill += Time.deltaTime;
+            EventBus.Instance.DoStandStill((int) timeStill);
+        }
 
         // Switch active spell
         SwitchSpell();
@@ -127,6 +142,7 @@ public class PlayerController : MonoBehaviour
     public void OnMove(InputValue value)
     {
         movement = value.Get<Vector2>();
+        EventBus.Instance.DoMove();
     }
 
     public void OnAim(InputValue value)

@@ -15,10 +15,15 @@ public class Hittable
     public void Damage(Damage damage)
     {
         EventBus.Instance.DoDamage(owner.transform.position, damage, this);
+        if (team == Team.PLAYER)
+        {
+            EventBus.Instance.DoTakeDamage(damage.amount);
+        }
         hp -= damage.amount;
         if (hp <= 0)
         {
             hp = 0;
+            EventBus.Instance.DoKill();
             OnDeath();
         }
     }
