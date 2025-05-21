@@ -53,5 +53,47 @@
             "type": "gain-mana",
             "amount": "25"
         }
+    },
+    {
+        "name": "Funny Skull",
+        "sprite": 4,
+        "trigger": {
+            "description": "When you switch active spells",
+            "type": "spell-switch"
+        },
+        "effect": {
+            "description": "your next spell gains 10 additional spellpower.",
+            "type": "gain-spellpower",
+            "amount": "10",
+            "until": "cast-spell"
+        }
+    },
+    {
+        "name": "Brittle Shield",
+        "sprite": 5,
+        "trigger": {
+            "description": "When you take damage",
+            "type": "take-damage"
+        },
+        "effect": {
+            "description": "you gain 5 speed until you switch spells.",
+            "type": "gain-speed",
+            "amount": "5",
+            "until": "spell-switch"
+        }
+    },
+    {
+        "name": "Blue Medallion",
+        "sprite": 6,
+        "trigger": {
+            "description": "When you kill an enemy",
+            "type": "on-kill"
+        },
+        "effect": {
+            "description": "your next spell gains 10 additional spellpower.",
+            "type": "gain-spellpower",
+            "amount": "10",
+            "until": "cast-spell"
+        }
     }
 ]

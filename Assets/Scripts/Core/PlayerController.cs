@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
 
         // Scale mana values based on wave (from requirements)
         UpdatePlayerStats();
+        speed = 5;
         
         // Set initial spell
         SpellBuilder.Initialize(Resources.Load<TextAsset>("spells").text);
@@ -81,7 +82,7 @@ public class PlayerController : MonoBehaviour
         spellcaster.power = (int)RPNEvaluator.EvaluateRPNFloat("wave 10 *", 0, 0, wave);
         Debug.Log("Wave: " + wave);
         // Player speed to "5"
-        speed = 5;
+        //speed = 5;
     }
 
     // Update is called once per frame
@@ -117,25 +118,28 @@ public class PlayerController : MonoBehaviour
     }
     void SwitchSpell()
     { // theres probably a nicer way to format this. like a switch statement -kirsten
+        int switchto = -1;
         if(Input.GetKeyDown(KeyCode.Alpha1) && spellcaster.GetSpellCount() > 0)
         {
-            spellcaster.spell = spellcaster.GetSpell(0);
-            spelluicontainer.SwitchHighlight(0);
+            switchto = 0;
         }
         if(Input.GetKeyDown(KeyCode.Alpha2) && spellcaster.GetSpellCount() > 1)
         {
-            spellcaster.spell = spellcaster.GetSpell(1);
-            spelluicontainer.SwitchHighlight(1);
+            switchto = 1;
         }
         if(Input.GetKeyDown(KeyCode.Alpha3) && spellcaster.GetSpellCount() > 2)
         {
-            spellcaster.spell = spellcaster.GetSpell(2);
-            spelluicontainer.SwitchHighlight(2);
+            switchto = 2;
         }
         if(Input.GetKeyDown(KeyCode.Alpha4) && spellcaster.GetSpellCount() > 3)
         {
-            spellcaster.spell = spellcaster.GetSpell(3);
-            spelluicontainer.SwitchHighlight(3);
+            switchto = 3;
+        }
+        if (switchto >= 0)
+        {
+            if (spellcaster.spell != spellcaster.GetSpell(switchto)) EventBus.Instance.DoSpellSwitch();
+            spellcaster.spell = spellcaster.GetSpell(switchto);
+            spelluicontainer.SwitchHighlight(switchto);
         }
     }
 

@@ -40,6 +40,9 @@ public class Relic
             case "on-kill":
                 EventBus.Instance.OnKill += DoEffect;
                 return;
+            case "spell-switch":
+                EventBus.Instance.OnSpellSwitch += DoEffect;
+                return;
             default:
                 // uh oh
                 return;
@@ -70,6 +73,9 @@ public class Relic
             case "gain-spellpower":
                 GainSpellpower();
                 return;
+            case "gain-speed":
+                GainSpeed();
+                return;
             default:
                 // uh oh
                 return;
@@ -98,6 +104,29 @@ public class Relic
             }
         }
     }
+    private void GainSpeed()
+    {
+        if (!IsActive())
+        {
+            active = true;
+            GameManager.Instance.player.GetComponent<PlayerController>().speed += RPNEvaluator.EvaluateRPN(effect.amount, 0, GameManager.Instance.wave);
+            //RPNEvaluator.EvaluateRPN(effect.duration, 0, GameManager.Instance.wave)
+            switch (effect.until)
+            {
+                case "move":
+                    EventBus.Instance.OnMove += Deactivate;
+                    break;
+                case "cast-spell":
+                    EventBus.Instance.OnCastSpell += Deactivate;
+                    break;
+                case "spell-switch":
+                    EventBus.Instance.OnSpellSwitch += Deactivate;
+                    return;
+                default:
+                    break;
+            }
+        }
+    }
     private void Deactivate()
     {
         if (IsActive())
@@ -111,6 +140,9 @@ public class Relic
                 case "cast-spell":
                     EventBus.Instance.OnCastSpell -= Deactivate;
                     break;
+                case "spell-switch":
+                    EventBus.Instance.OnSpellSwitch -= Deactivate;
+                    return;
                 default:
                     break;
             }
@@ -120,6 +152,9 @@ public class Relic
                     return;
                 case "gain-spellpower":
                     GameManager.Instance.player.GetComponent<SpellCaster>().power -= RPNEvaluator.EvaluateRPN(effect.amount, 0, GameManager.Instance.wave); // what if this happens between waves?
+                    return;
+                case "gain-speed":
+                    GameManager.Instance.player.GetComponent<PlayerController>().speed -= RPNEvaluator.EvaluateRPN(effect.amount, 0, GameManager.Instance.wave);
                     return;
                 default:
                     return;

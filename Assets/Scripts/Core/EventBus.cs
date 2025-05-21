@@ -37,6 +37,12 @@ public class EventBus
     {
         OnStandStill?.Invoke(amount);
     }
+
+    public event Action OnSpellSwitch;
+    public void DoSpellSwitch()
+    {
+        OnSpellSwitch?.Invoke();
+    }
     
     public event Action OnMove;
     public void DoMove()
