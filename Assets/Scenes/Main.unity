@@ -54550,6 +54550,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyspawner: {fileID: 519420033}
   classUIPrefab: {fileID: 9177612101870382659, guid: eed81c22fe9bdfc478fd41ce11602c2b, type: 3}
+  parentObj: {fileID: 0}
 --- !u!1001 &2306492998223050676
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -34,7 +34,6 @@ public class SpellBuilder
             }
         }
         
-        Debug.Log($"SpellBuilder initialized with {baseSpells.Count} base spells and {modifierSpells.Count} modifier spells");
     }
     
     // Create a spell from its key

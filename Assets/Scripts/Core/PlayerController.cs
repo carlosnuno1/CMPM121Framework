@@ -37,9 +37,8 @@ public class PlayerController : MonoBehaviour
         spellcaster = gameObject.AddComponent<SpellCaster>();
         spellcaster.team = Hittable.Team.PLAYER;
 
-        // Scale mana values based on wave (from requirements)
+        // Scale mana values with wave
         UpdatePlayerStats();
-        speed = 5;
         
         // Set initial spell
         SpellBuilder.Initialize(Resources.Load<TextAsset>("spells").text);
@@ -53,38 +52,51 @@ public class PlayerController : MonoBehaviour
         // initialize relics
         relics = new List<Relic>();
 
-        // tell UI elements what to show
+        // set ui elements
         healthui.SetHealth(hp);
         manaui.SetSpellCaster(spellcaster);
     }
 
-    // Add this method back for EnemySpawner
     public void StartLevel()
     {
         UpdatePlayerStats();
     }
 
-    void UpdatePlayerStats()
+void UpdatePlayerStats()
+{
+    int wave = GameManager.Instance.wave;
+    
+    // Nullcheck
+    if (playerclass == null)
     {
-        int wave = GameManager.Instance.wave;
-        // From requirements:
-        // Player hp to "95 wave 5 * +"
-        if (hp != null)
-        {
-            float newHp = RPNEvaluator.EvaluateRPNFloat("95 wave 5 * +", 0, 0, wave);
-            hp.SetMaxHP((int)newHp);
-        }
-        // Player mana to "90 wave 10 * +"
-        spellcaster.max_mana = RPNEvaluator.EvaluateRPNFloat("90 wave 10 * +", 0, 0, wave);
-        spellcaster.mana = spellcaster.max_mana;
-        // Player mana regeneration to "10 wave +"
-        spellcaster.mana_regen = RPNEvaluator.EvaluateRPNFloat("10 wave +", 0, 0, wave);
-        // Player spell power to "wave 10 *"
-        spellcaster.power = (int)RPNEvaluator.EvaluateRPNFloat("wave 10 *", 0, 0, wave);
-        Debug.Log("Wave: " + wave);
-        // Player speed to "5"
-        //speed = 5;
+        Debug.LogWarning("No player class selected! Using default values.");
+        return;
     }
+    
+    // Update health for class
+    if (hp != null)
+    {
+        float newHp = RPNEvaluator.EvaluateRPNFloat(playerclass.health, 0, 0, wave);
+        hp.SetMaxHP((int)newHp);
+    }
+    
+    // Update mana for class
+    spellcaster.max_mana = RPNEvaluator.EvaluateRPNFloat(playerclass.mana, 0, 0, wave);
+    spellcaster.mana = spellcaster.max_mana;
+    
+    // set mana regen
+    spellcaster.mana_regen = 10;
+    
+    // Update spell power for class
+    spellcaster.power = (int)RPNEvaluator.EvaluateRPNFloat(playerclass.spellpower, 0, 0, wave);
+    
+    // Update movement speed for class
+    float newSpeed = RPNEvaluator.EvaluateRPNFloat(playerclass.speed, 0, 0, wave);
+    speed = newSpeed;
+
+    // Update mana regen for class
+    spellcaster.mana_regen = RPNEvaluator.EvaluateRPNFloat(playerclass.mana_regeneration, 0, 0, wave);
+}
 
     // Update is called once per frame
     void Update()
