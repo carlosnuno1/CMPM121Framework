@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     public SpellCaster spellcaster;
     public SpellUIContainer spelluicontainer;
 
+    public Class playerclass;
     public float speed = 5;
 
     public Unit unit;

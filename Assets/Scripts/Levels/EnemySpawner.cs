@@ -28,8 +28,11 @@ public class EnemySpawner : MonoBehaviour
         // can we put the duplicate code between these 2 into yet another separate function --------! todo
         DeserializeEnemies();
         DeserializeLevels();
+        // class select screen
+    }
 
-        // can we move this to a separate function? ------------------------------------------------! todo
+    public void GenerateLevelSelectButtons()
+    {
         int offset = 0;
         foreach (var (k,v) in level_types)
         {
@@ -94,6 +97,11 @@ public class EnemySpawner : MonoBehaviour
     {
         GameManager.Instance.state = GameManager.GameState.PREGAME;
         level_selector.gameObject.SetActive(true);
+        
+        
+        //TODO: we need to clear living enemies, as well as reset acquired spells and relics
+
+
 
     }
 
