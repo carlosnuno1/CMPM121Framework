@@ -14,8 +14,6 @@ public class SpellRewardManager : MonoBehaviour
     public GameObject relicRewardPanel;
 
     [Header("Buttons")]
-    public Button acceptButton;
-    public Button rejectButton;
     public GameObject MainMenuButton;
 
     // there should be a better way of getting these at runtime
